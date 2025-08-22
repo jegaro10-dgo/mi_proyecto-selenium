@@ -1,0 +1,35 @@
+Email: juanyoung@example.com
+Password: ContrasenaSegura123!
+First Name: Steve
+Last Name: Contreras
+----------------------
+Email: susandominguez@example.com
+Password: ContrasenaSegura123!
+First Name: John
+Last Name: Woodard
+----------------------
+Email: rgraves@example.com
+Password: ContrasenaSegura123!
+First Name: Justin
+Last Name: Ramirez
+----------------------
+Email: alexandermiller@example.net
+Password: ContrasenaSegura123!
+First Name: Tanya
+Last Name: Rodgers
+----------------------
+Email: claymichael@example.net
+Password: ContrasenaSegura123!
+First Name: Monica
+Last Name: Morales
+----------------------
+Email: watsonsherry@example.org
+Password: ContrasenaSegura123!
+First Name: Carolyn
+Last Name: Smith
+----------------------
+Email: gclements@example.com
+Password: ContrasenaSegura123!
+First Name: Lisa
+Last Name: Bell
+----------------------
