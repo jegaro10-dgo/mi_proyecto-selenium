@@ -41,35 +41,22 @@ def test_probar_productos():
                 
                 # 3. Presionar Enter para realizar la búsqueda
                 search_box.send_keys(Keys.ENTER)
-
+                # Aquí es donde buscamos los enlaces de productos.
+                # Nota la 's' al final de find_elements
+                product_links = driver.find_elements(By.CLASS_NAME, "product-title")
+                
                 # 4. Verificar que la búsqueda fue exitosa
                 # VERIFICACIÓN: Lógica basada en tu idea
                 if disponibilidad.lower() == 'si':
-                    # Si esperamos que esté, el mensaje de "No products" NO debe aparecer.
-                    try:
-                        wait = WebDriverWait(driver, 5)
-                        wait.until(
-                            EC.presence_of_element_located((By.XPATH, "//strong[text()='No products were found that matched your criteria.']"))
-                        )
-                        # Si el mensaje apareció, la prueba falló.
-                        assert False, f"❌ Error: El producto '{nombre_producto}' no fue encontrado como se esperaba."
-                    except:
-                        # Si el mensaje NO apareció (lo que esperamos), la prueba es exitosa.
-                        print(f"✅ ¡Prueba exitosa! El producto '{nombre_producto}' fue encontrado.")
-                
+                # Si esperamos que esté, el número de enlaces de productos debe ser mayor que 0
+                    assert len(product_links) > 0, f"❌ Error: El producto '{nombre_producto}' no fue encontrado como se esperaba."
+                    print(f"✅ ¡Prueba exitosa! El producto '{nombre_producto}' fue encontrado.")
                 else:
-                    # Si esperamos que no esté, el mensaje de "No products" SÍ debe aparecer.
-                    try:
-                        wait = WebDriverWait(driver, 5)
-                        wait.until(
-                            EC.presence_of_element_located((By.XPATH, "//strong[text()='No products were found that matched your criteria.']"))
-                        )
-                        print(f"✅ ¡Prueba exitosa! El producto '{nombre_producto}' no fue encontrado como se esperaba.")
-                    except:
-                        # Si el mensaje NO apareció, la prueba falló.
-                        assert False, f"❌ Error: El producto '{nombre_producto}' fue encontrado, pero se esperaba que no lo estuviera."
+                # Si esperamos que no esté, el número de enlaces debe ser 0
+                    assert len(product_links) == 0, f"❌ Error: El producto '{nombre_producto}' fue encontrado, pero se esperaba que no lo estuviera."
+                    print(f"✅ ¡Prueba exitosa! El producto '{nombre_producto}' no fue encontrado como se esperaba.")
 
-                time.sleep(3)
+            time.sleep(2)
     finally:
         # 5. Cerrar el navegador al final de la prueba
         # (Esto también debe ir dentro del bucle para que se cierre después de cada prueba)
