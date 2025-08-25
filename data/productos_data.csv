@@ -1,0 +1,4 @@
+nombre_producto,precio,cantidad,sku,disponibilidad ,color ,categoria
+laptop,1200,2,123,si,blanco,electrónica
+celular,200,1,456,si,negro,electrónica
+lapiz,1,4,789,no,amarillo,papeleria
