@@ -40,7 +40,7 @@ class PurchasePage:
         self.BILLING_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#billing-buttons-container .new-address-next-step-button")
         
         # Locators del método de envío
-        self.SHIPPING_METHOD_RADIO = (By.ID, "shippingoption_0")
+        self.SHIPPING_METHOD_RADIO = (By.ID, "shippingoption_1")
         self.SHIPPING_METHOD_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#shipping-method-buttons-container .shipping-method-next-step-button")
         
         # Locators del método de pago
