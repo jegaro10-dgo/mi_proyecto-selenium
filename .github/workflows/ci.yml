@@ -1,32 +1,51 @@
+# Archivo: .github/workflows/python-app.yml
+
 name: Prueba de Integración Continua
 
 on:
   push:
     branches:
       - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
+    - name: Configurar Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Install Google Chrome
-        run: |
-          sudo apt-get update
-          sudo apt-get install google-chrome-stable
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Instalar Chromedriver
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-chromedriver
 
-      - name: Run Pytest
-        run: |
-          pytest
+    - name: Ejecutar pruebas con Pytest y generar reporte HTML
+      run: |
+        # Pytest ejecuta las pruebas y las opciones '--html' y '--self-contained-html' 
+        # le dicen que genere un reporte llamado 'report.html' que contiene todo lo que necesita en un solo archivo.
+        pytest --html=report.html --self-contained-html
+    
+    - name: Subir reporte de prueba
+      # 'if: always()' asegura que este paso se ejecute incluso si la prueba falla.
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        # 'name' es el nombre que se mostrará para el reporte en la página de GitHub Actions.
+        name: html-reporte-de-prueba
+        # 'path' es el archivo que se subirá.
+        path: report.html

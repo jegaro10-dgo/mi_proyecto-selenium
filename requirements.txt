@@ -28,3 +28,7 @@ tzdata==2025.2
 urllib3==2.5.0
 websocket-client==1.8.0
 wsproto==1.2.0
+pytest
+selenium
+faker
+pytest-html
