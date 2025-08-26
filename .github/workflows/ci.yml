@@ -29,6 +29,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
+    # Nuevo paso para instalar el navegador Chrome
+    - name: Instalar navegador Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        
     - name: Instalar Chromedriver
       run: |
         sudo apt-get update
