@@ -40,7 +40,7 @@ class PurchasePage:
         self.BILLING_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#billing-buttons-container .new-address-next-step-button")
         
         # Locators del método de envío
-        self.SHIPPING_METHOD_RADIO = (By.ID, "shippingoption_1")
+        self.SHIPPING_METHOD_RADIO = (By.ID, "shippingoption_0")
         self.SHIPPING_METHOD_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#shipping-method-buttons-container .shipping-method-next-step-button")
         
         # Locators del método de pago
@@ -144,6 +144,9 @@ class PurchasePage:
         Selecciona el método de envío.
         """
         try:
+            print("Esperando que la página de método de envío cargue.")
+            self.wait.until(EC.url_contains("shippingmethod"))
+            
             print("Seleccionando el método de envío.")
             self.wait.until(EC.element_to_be_clickable(self.SHIPPING_METHOD_RADIO)).click()
             self.wait.until(EC.element_to_be_clickable(self.SHIPPING_METHOD_CONTINUE_BUTTON)).click()
@@ -156,81 +159,4 @@ class PurchasePage:
         """
         try:
             print("Seleccionando el método de pago.")
-            self.wait.until(EC.element_to_be_clickable(self.PAYMENT_METHOD_RADIO)).click()
-            self.wait.until(EC.element_to_be_clickable(self.PAYMENT_METHOD_CONTINUE_BUTTON)).click()
-        except TimeoutException as e:
-            pytest.fail(f"Error de Timeout al seleccionar el método de pago. Causa: {e}")
-
-    def fill_payment_info(self):
-        """
-        Rellena la información del pago.
-        """
-        try:
-            print("Rellenando la información de la tarjeta.")
-            self.wait.until(EC.presence_of_element_located(self.CARD_HOLDER_NAME)).send_keys("Jesus Garcia Rojas")
-            self.wait.until(EC.presence_of_element_located(self.CARD_NUMBER)).send_keys("5429999999999999")
-            
-            card_exp_month_element = self.wait.until(EC.presence_of_element_located(self.CARD_EXP_MONTH))
-            card_exp_month = Select(card_exp_month_element)
-            card_exp_month.select_by_value("4")
-            
-            card_exp_year_element = self.wait.until(EC.presence_of_element_located(self.CARD_EXP_YEAR))
-            card_exp_year = Select(card_exp_year_element)
-            card_exp_year.select_by_value("2026")
-            
-            self.wait.until(EC.presence_of_element_located(self.CARD_CODE)).send_keys("123")
-            
-            self.wait.until(EC.element_to_be_clickable(self.PAYMENT_INFO_CONTINUE_BUTTON)).click()
-        except (NoSuchElementException, TimeoutException) as e:
-            pytest.fail(f"Error al rellenar la información de pago. Causa: {e}")
-
-    def confirm_order(self):
-        """
-        Confirma la orden.
-        """
-        try:
-            print("Confirmando la orden.")
-            self.wait.until(EC.element_to_be_clickable(self.CONFIRM_BUTTON)).click()
-        except TimeoutException as e:
-            pytest.fail(f"Error de Timeout al confirmar la orden. Causa: {e}")
-        except WebDriverException as e:
-            pytest.fail(f"Error de WebDriver al confirmar la orden. Causa: {e}")
-            
-    def verify_order_success(self):
-        """
-        Verifica que la orden fue procesada exitosamente.
-        """
-        try:
-            print("Verificando que la orden se procesó correctamente.")
-            self.wait.until(EC.presence_of_element_located(self.ORDER_SUCCESS_MESSAGE))
-        except TimeoutException as e:
-            pytest.fail(f"Error de Timeout al verificar el mensaje de éxito. Causa: {e}")
-    
-    def add_product_by_name_and_add_to_cart(self, product_name):
-        """
-        Busca un producto por su nombre y lo añade al carrito.
-        Combina la lógica de búsqueda y adición en un solo método robusto.
-        """
-        try:
-            print(f"Buscando el producto: {product_name}")
-            # Esperar y escribir en el campo de búsqueda
-            search_input_element = self.wait.until(EC.element_to_be_clickable(self.SEARCH_INPUT))
-            search_input_element.send_keys(product_name)
-            
-            # Esperar y hacer clic en el botón de búsqueda
-            self.wait.until(EC.element_to_be_clickable(self.SEARCH_BUTTON)).click()
-            
-            # Esperar y hacer clic en el enlace del producto en la página de resultados
-            print("Haciendo clic en el producto...")
-            product_link_locator = (By.XPATH, self.PRODUCT_LINK_XPATH.format(product_name))
-            product_link = self.wait.until(EC.element_to_be_clickable(product_link_locator))
-            product_link.click()
-            
-            # Esperar y hacer clic en el botón "Add to cart"
-            print("Haciendo clic en el botón 'Add to cart'...")
-            add_to_cart_button_element = self.wait.until(EC.element_to_be_clickable(self.ADD_TO_CART_BUTTON))
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", add_to_cart_button_element)
-            add_to_cart_button_element.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            pytest.fail(f"Error al buscar o añadir el producto al carrito. Un elemento no fue encontrado o la espera falló. Causa: {e}")
-
+            self.wait.until(EC.element_to_be_clickable(self.PAYMENT_METH
