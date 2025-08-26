@@ -33,14 +33,14 @@ jobs:
     - name: Instalar Chromium y Chromedriver
       run: |
         sudo apt-get update
-        sudo apt-get install -y chromium-browser chromium-chromedriver
-
+        sudo apt-get install -y chromium-browser
+    
+    # Nuevo paso para ejecutar las pruebas con el navegador correcto
     - name: Ejecutar pruebas con Pytest y generar reporte HTML
       run: |
-        # Pytest ejecuta las pruebas y las opciones '--html' y '--self-contained-html' 
-        # le dicen que genere un reporte llamado 'report.html' que contiene todo lo que necesita en un solo archivo.
-        pytest --html=report.html --self-contained-html
-    
+        # Añade la opción `--driver-path` para especificar la ruta del chromedriver
+        pytest --html=report.html --self-contained-html --driver-path=/usr/lib/chromium-browser/chromedriver
+
     - name: Subir reporte de prueba
       # 'if: always()' asegura que este paso se ejecute incluso si la prueba falla.
       if: always()
