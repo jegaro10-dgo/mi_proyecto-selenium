@@ -15,6 +15,7 @@ def driver():
     chrome_options.add_argument("--disable-dev-shm-usage")
     
     driver = webdriver.Chrome(options=chrome_options)
+    driver.implicitly_wait(10)
     yield driver  # Esto es lo que se retorna a la prueba
     
     # Esta parte se ejecuta después de que la prueba termina
