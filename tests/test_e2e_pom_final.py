@@ -1,101 +1,79 @@
 import pytest
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from faker import Faker
-import time
-from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from pages.purchase_page import PurchasePage  # Importamos la clase de página refactorizada
 
-
-# Importa las clases de las páginas que creaste
-from pages.registration_page import RegistrationPage
-from pages.login_page import LoginPage
-from pages.purchase_page import PurchasePage
-
-def test_end_to_end_purchase_flow(driver):
+@pytest.fixture(scope="module")
+def setup_teardown():
     """
-    Prueba el flujo completo de compra: registro, inicio de sesión y compra.
+    Fixture de Pytest para inicializar y cerrar el navegador.
+    Utiliza el patrón de Page Object Model.
     """
-    try:
-        # --- Parte 1: Registro del usuario con Faker ---
-        print("Iniciando la prueba End-to-End...")
-        print("Paso 1: Registrando un nuevo usuario...")
-        
-        fake = Faker()
-        first_name = fake.first_name()
-        last_name = fake.last_name()
-        email = fake.email()
-        password = "ContrasenaSegura123!"
-        
+    print("\nIniciando el navegador...")
+    # Usa webdriver_manager para gestionar automáticamente el driver de Chrome
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    driver.maximize_window()
+    yield driver
+    print("\nCerrando el navegador...")
+    driver.quit()
 
-        # Usa el objeto de la página de registro para el flujo de registro
-        registration_page = RegistrationPage(driver)
-        registration_page.go_to_page()
-        registration_page.register_user(first_name, last_name, email, password)
-        registration_page.get_registration_result()
-        
-        print("Paso 1 completado: Usuario registrado.")
-        
-        # --- Parte 2: Inicio de sesión con el nuevo usuario ---
-        print("Paso 2: Iniciando sesión con el usuario recién creado...")
-        
-        # Usa el objeto de la página de inicio de sesión para el flujo de login
-        login_page = LoginPage(driver)
-        login_page.go_to_page()
-        login_page.login_with_credentials(email, password)
-        login_page.verify_login_successful(email)
-        
-        print("Paso 2 completado: Inicio de sesión exitoso.")
-        
-        # --- Parte 3: Flujo de compra ---
-        print("Paso 3: Iniciando el proceso de compra...")
-        
-        # 3.1 Añadir producto al carrito
-        driver.find_element(By.XPATH, "//a[text()='14.1-inch Laptop']").click()
-        driver.find_element(By.ID, "add-to-cart-button-31").click()
-        
-        # 3.2 y siguientes... Usa el objeto de la página de compra
-        purchase_page = PurchasePage(driver)
-        
-        print("Ir al carrito y checkout...")
-        purchase_page.go_to_shopping_cart()
-        purchase_page.checkout()
-        
-        print("Rellenando la dirección de facturación...")
-        purchase_page.fill_billing_address(
-            first_name="Jesus",
-            last_name="Garcia Rojas",
-            email=email,
-            country="Mexico",
-            #state="New York",
-            city="New York",
-            address1="123 Test St",
-            zip_code="10001",
-            phone="555-555-5555"
-        )
-        print("Continuando a la selección del método de envío...")
-        purchase_page.click_shipping_address_continue()
-        
-        print("Seleccionando método de envío...")
-        purchase_page.select_shipping_method()
-        
-        print("Seleccionando método de pago...")
-        purchase_page.select_payment_method()
-        
-        print("Rellenando información de tarjeta...")
-        purchase_page.fill_payment_info()
-        
-        print("Confirmando orden...")
-        purchase_page.confirm_order()
-        
-        print("Verificando que la orden se procesó...")
-        purchase_page.verify_order_success()
+def test_end_to_end_purchase_flow(setup_teardown):
+    """
+    Prueba de extremo a extremo del flujo de compra como usuario invitado.
+    Utiliza la clase PurchasePage para interactuar con la web.
+    """
+    driver = setup_teardown
+    purchase_page = PurchasePage(driver)
+    
+    # Paso 1: Navegar a la página de inicio
+    print("Navegando a la página de inicio...")
+    driver.get(purchase_page.URL)
 
-        print("Paso 3 completado: ¡Orden procesada con éxito!")
-        print("Prueba End-to-End finalizada con éxito.")
+    # Paso 2: Buscar un producto y agregarlo al carrito.
+    # Usamos el nuevo método combinado para mayor robustez.
+    print("Paso 2: Buscando y agregando el producto '14.1-inch Laptop' al carrito.")
+    purchase_page.add_product_by_name_and_add_to_cart("14.1-inch Laptop")
+    
+    # Paso 3: Navegar al carrito y proceder al checkout
+    print("Paso 3: Navegando al carrito de compras y procediendo al checkout.")
+    purchase_page.go_to_shopping_cart()
+    purchase_page.checkout()
+    purchase_page.checkout_as_guest()
 
-    except Exception as e:
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        screenshot_filename = f"e2e_failure_{timestamp}.png"
-        driver.save_screenshot(screenshot_filename)
-        pytest.fail(f"La prueba End-to-End falló. Se guardó una captura de pantalla: {screenshot_filename}. Causa: {e}")
+    # Paso 4: Rellenar la dirección de facturación
+    print("Paso 4: Rellenando la dirección de facturación.")
+    purchase_page.fill_billing_address(
+        first_name="NombrePrueba",
+        last_name="ApellidoPrueba",
+        email="prueba@prueba.com",
+        country="Mexico",
+        city="Ciudad de Mexico",
+        address1="Calle Falsa 123",
+        zip_code="01000",
+        phone="5512345678"
+    )
+    purchase_page.click_shipping_address_continue()
+
+    # Paso 5: Seleccionar el método de envío
+    print("Paso 5: Seleccionando el método de envío.")
+    purchase_page.select_shipping_method()
+
+    # Paso 6: Seleccionar el método de pago
+    print("Paso 6: Seleccionando el método de pago.")
+    purchase_page.select_payment_method()
+
+    # Paso 7: Rellenar la información de pago
+    print("Paso 7: Rellenando la información de pago.")
+    purchase_page.fill_payment_info()
+
+    # Paso 8: Confirmar la orden
+    print("Paso 8: Confirmando la orden.")
+    purchase_page.confirm_order()
+
+    # Paso 9: Verificar el mensaje de éxito
+    print("Paso 9: Verificando que la orden se procesó correctamente.")
+    purchase_page.verify_order_success()
+
+    print("\n¡Prueba de flujo de compra completada con éxito!")
+

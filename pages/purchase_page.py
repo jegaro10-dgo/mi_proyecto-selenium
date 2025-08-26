@@ -1,5 +1,3 @@
-# pages/purchase_page.py
-
 import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -8,9 +6,14 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException,
 
 
 class PurchasePage:
+    """
+    Clase que representa la página de compra y checkout.
+    Contiene locators y métodos para las interacciones del usuario en esta página.
+    """
     def __init__(self, driver):
         self.driver = driver
-        self.wait = WebDriverWait(self.driver, 15)  # Aumenta el tiempo de espera a 15 segundos
+        # Aumenta el tiempo de espera a 15 segundos
+        self.wait = WebDriverWait(self.driver, 15)
         self.URL = "https://demowebshop.tricentis.com"
         
         # Locators
@@ -19,13 +22,13 @@ class PurchasePage:
         self.CHECKOUT_BUTTON = (By.ID, "checkout")
         self.CHECKOUT_AS_GUEST_BUTTON = (By.CSS_SELECTOR, ".checkout-as-guest-button")
         
-        # New locators for product search and add to cart
+        # Locators para la búsqueda de productos
         self.SEARCH_INPUT = (By.ID, "small-searchterms")
         self.SEARCH_BUTTON = (By.CSS_SELECTOR, ".search-box-button")
-        # Locator for "Add to cart" button, updated to use a more robust locator
+        self.PRODUCT_LINK_XPATH = "//a[text()='{}']"
         self.ADD_TO_CART_BUTTON = (By.XPATH, "//input[@value='Add to cart' and contains(@class, 'add-to-cart-button')]")
 
-        # Billing address locators
+        # Locators de la dirección de facturación
         self.BILLING_FIRST_NAME_INPUT = (By.ID, "BillingNewAddress_FirstName")
         self.BILLING_LAST_NAME_INPUT = (By.ID, "BillingNewAddress_LastName")
         self.BILLING_EMAIL_INPUT = (By.ID, "BillingNewAddress_Email")
@@ -36,15 +39,15 @@ class PurchasePage:
         self.BILLING_PHONE_INPUT = (By.ID, "BillingNewAddress_PhoneNumber")
         self.BILLING_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#billing-buttons-container .new-address-next-step-button")
         
-        # Shipping method locators
+        # Locators del método de envío
         self.SHIPPING_METHOD_RADIO = (By.ID, "shippingoption_0")
         self.SHIPPING_METHOD_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#shipping-method-buttons-container .shipping-method-next-step-button")
         
-        # Payment method locators
+        # Locators del método de pago
         self.PAYMENT_METHOD_RADIO = (By.ID, "paymentmethod_1")
         self.PAYMENT_METHOD_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#payment-method-buttons-container .payment-method-next-step-button")
         
-        # Payment info locators
+        # Locators de la información de pago
         self.CARD_HOLDER_NAME = (By.ID, "CardholderName")
         self.CARD_NUMBER = (By.ID, "CardNumber")
         self.CARD_EXP_MONTH = (By.ID, "ExpireMonth")
@@ -52,10 +55,10 @@ class PurchasePage:
         self.CARD_CODE = (By.ID, "CardCode")
         self.PAYMENT_INFO_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#payment-info-buttons-container .payment-info-next-step-button")
         
-        # Confirmation locators
+        # Locators de la confirmación
         self.CONFIRM_BUTTON = (By.CSS_SELECTOR, "#confirm-order-buttons-container .confirm-order-next-step-button")
         
-        # Order success locators
+        # Locators de éxito de la orden
         self.ORDER_SUCCESS_MESSAGE = (By.XPATH, "//div[contains(text(), 'Your order has been successfully processed!')]")
         self.ORDER_NUMBER_LINK = (By.XPATH, "//a[contains(text(), 'Click here for order details.')]")
 
@@ -65,7 +68,10 @@ class PurchasePage:
         """
         try:
             self.driver.get(f"{self.URL}/cart")
+            self.wait.until(EC.url_contains("/cart"))
             print("Navegado al carrito de compras.")
+        except TimeoutException as e:
+            pytest.fail(f"Error de Timeout al navegar al carrito. Causa: {e}")
         except WebDriverException as e:
             pytest.fail(f"WebDriverError al navegar al carrito. Causa: {e}")
     
@@ -74,21 +80,16 @@ class PurchasePage:
         Acepta los términos de servicio y hace clic en el botón de checkout.
         """
         try:
-            # Esperar a que la URL del carrito se cargue correctamente
-            self.wait.until(EC.url_contains("/cart"))
-            
-            # 1. Esperar a que el checkbox sea visible y clicable
             print("Esperando que el checkbox de términos de servicio sea clicable.")
             terms_checkbox = self.wait.until(EC.element_to_be_clickable(self.TERMS_OF_SERVICE_CHECKBOX))
             self.driver.execute_script("arguments[0].scrollIntoView(true);", terms_checkbox)
             
-            # 2. Hacer clic en el checkbox
             print("Haciendo clic en el checkbox de términos de servicio.")
             terms_checkbox.click()
             
-            # 3. Hacer clic en el botón de checkout
             print("Haciendo clic en el botón de checkout.")
-            self.wait.until(EC.element_to_be_clickable(self.CHECKOUT_BUTTON)).click()
+            checkout_button = self.wait.until(EC.element_to_be_clickable(self.CHECKOUT_BUTTON))
+            checkout_button.click()
         except TimeoutException as e:
             pytest.fail(f"Error de Timeout en el checkout. No se pudo interactuar con los elementos. Causa: {e}")
         except Exception as e:
@@ -100,7 +101,8 @@ class PurchasePage:
         """
         try:
             print("Seleccionando la opción de checkout como invitado.")
-            self.wait.until(EC.element_to_be_clickable(self.CHECKOUT_AS_GUEST_BUTTON)).click()
+            guest_button = self.wait.until(EC.element_to_be_clickable(self.CHECKOUT_AS_GUEST_BUTTON))
+            guest_button.click()
         except TimeoutException as e:
             pytest.fail(f"Error de Timeout en 'checkout_as_guest'. No se pudo encontrar o hacer clic en el botón 'Checkout as Guest'. Causa: {e}")
 
@@ -110,21 +112,20 @@ class PurchasePage:
         """
         try:
             print("Rellenando la dirección de facturación.")
-            # Esperar a que el formulario sea visible
-            self.wait.until(EC.presence_of_element_located(self.BILLING_FIRST_NAME_INPUT))
-            
-            self.driver.find_element(*self.BILLING_FIRST_NAME_INPUT).send_keys(first_name)
-            self.driver.find_element(*self.BILLING_LAST_NAME_INPUT).send_keys(last_name)
-            self.driver.find_element(*self.BILLING_EMAIL_INPUT).send_keys(email)
+            # Esperar a cada elemento antes de interactuar con él
+            self.wait.until(EC.presence_of_element_located(self.BILLING_FIRST_NAME_INPUT)).send_keys(first_name)
+            self.wait.until(EC.presence_of_element_located(self.BILLING_LAST_NAME_INPUT)).send_keys(last_name)
+            self.wait.until(EC.presence_of_element_located(self.BILLING_EMAIL_INPUT)).send_keys(email)
             
             # Selección de país
-            country_select = Select(self.driver.find_element(*self.BILLING_COUNTRY_SELECT))
+            country_select_element = self.wait.until(EC.presence_of_element_located(self.BILLING_COUNTRY_SELECT))
+            country_select = Select(country_select_element)
             country_select.select_by_visible_text(country)
             
-            self.driver.find_element(*self.BILLING_CITY_INPUT).send_keys(city)
-            self.driver.find_element(*self.BILLING_ADDRESS1_INPUT).send_keys(address1)
-            self.driver.find_element(*self.BILLING_ZIP_CODE_INPUT).send_keys(zip_code)
-            self.driver.find_element(*self.BILLING_PHONE_INPUT).send_keys(phone)
+            self.wait.until(EC.presence_of_element_located(self.BILLING_CITY_INPUT)).send_keys(city)
+            self.wait.until(EC.presence_of_element_located(self.BILLING_ADDRESS1_INPUT)).send_keys(address1)
+            self.wait.until(EC.presence_of_element_located(self.BILLING_ZIP_CODE_INPUT)).send_keys(zip_code)
+            self.wait.until(EC.presence_of_element_located(self.BILLING_PHONE_INPUT)).send_keys(phone)
         except (NoSuchElementException, TimeoutException) as e:
             pytest.fail(f"Error al rellenar la dirección de facturación. Un elemento no fue encontrado o la espera falló. Causa: {e}")
 
@@ -167,15 +168,17 @@ class PurchasePage:
         try:
             print("Rellenando la información de la tarjeta.")
             self.wait.until(EC.presence_of_element_located(self.CARD_HOLDER_NAME)).send_keys("Jesus Garcia Rojas")
-            self.driver.find_element(*self.CARD_NUMBER).send_keys("5429999999999999")
+            self.wait.until(EC.presence_of_element_located(self.CARD_NUMBER)).send_keys("5429999999999999")
             
-            card_exp_month = Select(self.driver.find_element(*self.CARD_EXP_MONTH))
+            card_exp_month_element = self.wait.until(EC.presence_of_element_located(self.CARD_EXP_MONTH))
+            card_exp_month = Select(card_exp_month_element)
             card_exp_month.select_by_value("4")
             
-            card_exp_year = Select(self.driver.find_element(*self.CARD_EXP_YEAR))
+            card_exp_year_element = self.wait.until(EC.presence_of_element_located(self.CARD_EXP_YEAR))
+            card_exp_year = Select(card_exp_year_element)
             card_exp_year.select_by_value("2026")
             
-            self.driver.find_element(*self.CARD_CODE).send_keys("123")
+            self.wait.until(EC.presence_of_element_located(self.CARD_CODE)).send_keys("123")
             
             self.wait.until(EC.element_to_be_clickable(self.PAYMENT_INFO_CONTINUE_BUTTON)).click()
         except (NoSuchElementException, TimeoutException) as e:
@@ -203,36 +206,31 @@ class PurchasePage:
         except TimeoutException as e:
             pytest.fail(f"Error de Timeout al verificar el mensaje de éxito. Causa: {e}")
     
-    def write_name_of_product(self, product_name):
+    def add_product_by_name_and_add_to_cart(self, product_name):
         """
-        Busca un producto por su nombre.
+        Busca un producto por su nombre y lo añade al carrito.
+        Combina la lógica de búsqueda y adición en un solo método robusto.
         """
         try:
             print(f"Buscando el producto: {product_name}")
-            # Realizar scroll al elemento de búsqueda antes de interactuar con él
-            search_input_element = self.wait.until(EC.presence_of_element_located(self.SEARCH_INPUT))
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", search_input_element)
-            
+            # Esperar y escribir en el campo de búsqueda
+            search_input_element = self.wait.until(EC.element_to_be_clickable(self.SEARCH_INPUT))
             search_input_element.send_keys(product_name)
+            
+            # Esperar y hacer clic en el botón de búsqueda
             self.wait.until(EC.element_to_be_clickable(self.SEARCH_BUTTON)).click()
-        except (NoSuchElementException, TimeoutException) as e:
-            pytest.fail(f"Error al buscar el producto '{product_name}'. Un elemento no fue encontrado o la espera falló. Causa: {e}")
-
-    def add_product_to_cart(self):
-        """
-        Hace clic en el enlace del producto y luego en el botón de añadir al carrito.
-        """
-        try:
+            
+            # Esperar y hacer clic en el enlace del producto en la página de resultados
             print("Haciendo clic en el producto...")
-            # El producto tiene un enlace con el texto que contiene el nombre, por lo que usaremos ese localizador
-            product_link = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//a[text()='14.1-inch Laptop']")))
+            product_link_locator = (By.XPATH, self.PRODUCT_LINK_XPATH.format(product_name))
+            product_link = self.wait.until(EC.element_to_be_clickable(product_link_locator))
             product_link.click()
             
+            # Esperar y hacer clic en el botón "Add to cart"
             print("Haciendo clic en el botón 'Add to cart'...")
-            # Realizar scroll al botón 'Add to cart' antes de hacer clic
             add_to_cart_button_element = self.wait.until(EC.element_to_be_clickable(self.ADD_TO_CART_BUTTON))
             self.driver.execute_script("arguments[0].scrollIntoView(true);", add_to_cart_button_element)
-            
             add_to_cart_button_element.click()
         except (NoSuchElementException, TimeoutException) as e:
-            pytest.fail(f"Error al añadir el producto al carrito. No se encontró el enlace o el botón. Causa: {e}")
+            pytest.fail(f"Error al buscar o añadir el producto al carrito. Un elemento no fue encontrado o la espera falló. Causa: {e}")
+
