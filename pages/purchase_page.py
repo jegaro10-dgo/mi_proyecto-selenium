@@ -27,6 +27,7 @@ class PurchasePage:
         self.SEARCH_BUTTON = (By.CSS_SELECTOR, ".search-box-button")
         self.PRODUCT_LINK_XPATH = "//a[text()='{}']"
         self.ADD_TO_CART_BUTTON = (By.XPATH, "//input[@value='Add to cart' and contains(@class, 'add-to-cart-button')]")
+        self.GO_TO_CHECKOUT_BUTTON = (By.ID, "checkout")
 
         # Locators de la dirección de facturación
         self.BILLING_FIRST_NAME_INPUT = (By.ID, "BillingNewAddress_FirstName")
@@ -37,7 +38,7 @@ class PurchasePage:
         self.BILLING_ADDRESS1_INPUT = (By.ID, "BillingNewAddress_Address1")
         self.BILLING_ZIP_CODE_INPUT = (By.ID, "BillingNewAddress_ZipPostalCode")
         self.BILLING_PHONE_INPUT = (By.ID, "BillingNewAddress_PhoneNumber")
-        self.BILLING_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#billing-buttons-container .button-1 new-address-next-step-button")
+        self.BILLING_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#billing-buttons-container .new-address-next-step-button")
         
         # Locators del método de envío
         self.SHIPPING_METHOD_RADIO = (By.ID, "shippingoption_0")
@@ -139,7 +140,7 @@ class PurchasePage:
             continue_button = self.wait.until(EC.element_to_be_clickable(self.BILLING_CONTINUE_BUTTON))
             continue_button.click()
             
-            # Espera explícitamente a que el siguiente elemento esté presente
+            # Espera explícita para el elemento de la página de envío
             self.wait.until(EC.element_to_be_clickable(self.SHIPPING_METHOD_RADIO))
             print("Página de método de envío cargada con éxito.")
         except TimeoutException as e:
