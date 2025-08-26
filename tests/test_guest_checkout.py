@@ -1,6 +1,8 @@
 import pytest
 from faker import Faker
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from pages.purchase_page import PurchasePage
 
 @pytest.fixture(scope="module")
@@ -39,11 +41,13 @@ def test_guest_checkout(setup_teardown):
         
         # Continuar con el flujo de checkout
         print("Paso 2: Navegando al carrito de compras y procediendo al checkout.")
-        # Reemplazamos el driver.get() con una espera y clic en el enlace del carrito
+        
+        # Espera y clic en el enlace del carrito
         wait = WebDriverWait(driver, 15)
         shopping_cart_link = wait.until(EC.element_to_be_clickable(purchase_page.SHOPPING_CART_LINK))
         shopping_cart_link.click()
 
+        # Re-localizamos los elementos de la página de checkout para evitar el error de "stale element"
         purchase_page.checkout()
         purchase_page.checkout_as_guest()
 
