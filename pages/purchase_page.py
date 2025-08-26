@@ -1,7 +1,6 @@
 # pages/purchase_page.py
-import pytest
-# pages/purchase_page.py
 
+import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
@@ -77,14 +76,14 @@ class PurchasePage:
             # Esperar a que la URL del carrito se cargue correctamente
             self.wait.until(EC.url_contains("/cart"))
             
-            # 1. Hacer scroll hasta el elemento para asegurar que esté visible
-            print("Haciendo scroll hasta el checkbox de términos de servicio.")
-            terms_checkbox = self.wait.until(EC.presence_of_element_located(self.TERMS_OF_SERVICE_CHECKBOX))
+            # 1. Esperar a que el checkbox sea visible y clicable
+            print("Esperando que el checkbox de términos de servicio sea clicable.")
+            terms_checkbox = self.wait.until(EC.element_to_be_clickable(self.TERMS_OF_SERVICE_CHECKBOX))
             self.driver.execute_script("arguments[0].scrollIntoView(true);", terms_checkbox)
             
             # 2. Hacer clic en el checkbox
             print("Haciendo clic en el checkbox de términos de servicio.")
-            self.wait.until(EC.element_to_be_clickable(self.TERMS_OF_SERVICE_CHECKBOX)).click()
+            terms_checkbox.click()
             
             # 3. Hacer clic en el botón de checkout
             print("Haciendo clic en el botón de checkout.")
