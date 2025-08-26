@@ -1,5 +1,4 @@
 import pytest
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,8 +6,10 @@ from faker import Faker
 import time
 import os # Importar la librería para manejar archivos
 
-def test_user_registration():
-
+def test_user_registration(driver):
+    """
+    Prueba el registro de un usuario nuevo con datos aleatorios.
+    """
     # Inicializar la librería Faker
     fake = Faker()
 
@@ -17,9 +18,6 @@ def test_user_registration():
     last_name = fake.last_name()
     email = fake.email()
     password = "ContrasenaSegura123!" # Para simplificar, la contraseña es fija
-
-    # 1. Configurar el WebDriver para Chrome
-    driver = webdriver.Chrome()
 
     try:
         # 2. Navegar a la página de registro
@@ -64,9 +62,3 @@ def test_user_registration():
  
     except Exception as e:
         print(f"Ocurrió un error en la prueba: {e}")
-
-    finally:
-        # Pausar para que puedas ver el resultado.
-        time.sleep(5)
-        print("Cerrando el navegador...")
-        driver.quit()

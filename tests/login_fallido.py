@@ -4,10 +4,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-def test_login_fallido():
-    # 1. Inicializar el driver
-    driver = webdriver.Chrome()
 
+def test_login_fallido(driver):
+    """
+    Prueba que el inicio de sesión falle con credenciales incorrectas.
+    """
     try:
         # 2. Navegar a la página de login
         driver.get("https://demowebshop.tricentis.com/login")
@@ -36,6 +37,5 @@ def test_login_fallido():
         
         print(f"✅ ¡Prueba exitosa! El mensaje de error esperado '{expected_text}' se mostró correctamente.")
 
-    finally:
-        # 8. Cerrar el navegador al finalizar la prueba
-        driver.quit()
+    except Exception as e:
+        pytest.fail(f"La prueba de login fallido falló. Causa: {e}")
