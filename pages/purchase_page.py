@@ -22,7 +22,8 @@ class PurchasePage:
         # New locators for product search and add to cart
         self.SEARCH_INPUT = (By.ID, "small-searchterms")
         self.SEARCH_BUTTON = (By.CSS_SELECTOR, ".search-box-button")
-        self.ADD_TO_CART_BUTTON = (By.ID, "add-to-cart-button-31")
+        # Locator for "Add to cart" button, updated to use a more robust locator
+        self.ADD_TO_CART_BUTTON = (By.XPATH, "//input[@value='Add to cart' and contains(@class, 'add-to-cart-button')]")
 
         # Billing address locators
         self.BILLING_FIRST_NAME_INPUT = (By.ID, "BillingNewAddress_FirstName")
