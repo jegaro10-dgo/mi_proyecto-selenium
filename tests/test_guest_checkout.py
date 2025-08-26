@@ -47,7 +47,10 @@ def test_guest_checkout(setup_teardown):
         shopping_cart_link = wait.until(EC.element_to_be_clickable(purchase_page.SHOPPING_CART_LINK))
         shopping_cart_link.click()
 
-        # Re-localizamos los elementos de la página de checkout para evitar el error de "stale element"
+        # Añadimos una espera explícita para que la URL cambie a la página de checkout.
+        wait.until(EC.url_contains("/checkout"))
+
+        # Ahora que la página de checkout está cargada, re-localizamos los elementos.
         purchase_page.checkout()
         purchase_page.checkout_as_guest()
 
