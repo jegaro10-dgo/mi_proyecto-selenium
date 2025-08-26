@@ -29,16 +29,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    # Nuevo paso para instalar el navegador Chrome
-    - name: Instalar navegador Chrome
+    # Nuevo paso para instalar el navegador Chromium y su driver
+    - name: Instalar Chromium y Chromedriver
       run: |
         sudo apt-get update
-        sudo apt-get install -y google-chrome-stable
-        
-    - name: Instalar Chromedriver
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y chromium-chromedriver
+        sudo apt-get install -y chromium-browser chromium-chromedriver
 
     - name: Ejecutar pruebas con Pytest y generar reporte HTML
       run: |
