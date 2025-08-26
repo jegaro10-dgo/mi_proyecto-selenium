@@ -1,6 +1,8 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+import pytest
 
 class PurchasePage:
     def __init__(self, driver):
@@ -78,22 +80,25 @@ class PurchasePage:
     def fill_billing_address(self, first_name, last_name, email, country, city, address1, zip_code, phone, state=None):
         #campos obligatorios para usuario invitado
         print("Llenando datos de usuario invitado")
-        self.wait.until(EC.presence_of_element_located(self.BILLING_EMAIL_INPUT)).send_keys(email)
-        self.wait.until(EC.presence_of_element_located(self.BILLING_FIRST_NAME)).send_keys(first_name)
-        self.wait.until(EC.presence_of_element_located(self.BILLING_LAST_NAME)).send_keys(last_name)
-        
-        Select(self.wait.until(EC.presence_of_element_located(self.BILLING_COUNTRY_DROPDOWN))).select_by_visible_text(country)
-        
-        # Ahora, solo si se proporciona un estado, intentamos seleccionarlo.
-        if state:
-            self.wait.until(EC.presence_of_element_located(self.BILLING_STATE_DROPDOWN))
-            Select(self.driver.find_element(*self.BILLING_STATE_DROPDOWN)).select_by_visible_text(state)
+        try:
+            self.wait.until(EC.presence_of_element_located(self.BILLING_EMAIL_INPUT)).send_keys(email)
+            self.wait.until(EC.presence_of_element_located(self.BILLING_FIRST_NAME)).send_keys(first_name)
+            self.wait.until(EC.presence_of_element_located(self.BILLING_LAST_NAME)).send_keys(last_name)
+            
+            Select(self.wait.until(EC.presence_of_element_located(self.BILLING_COUNTRY_DROPDOWN))).select_by_visible_text(country)
+            
+            # Ahora, solo si se proporciona un estado, intentamos seleccionarlo.
+            if state:
+                self.wait.until(EC.presence_of_element_located(self.BILLING_STATE_DROPDOWN))
+                Select(self.driver.find_element(*self.BILLING_STATE_DROPDOWN)).select_by_visible_text(state)
 
-        self.driver.find_element(*self.BILLING_CITY_INPUT).send_keys(city)
-        self.driver.find_element(*self.BILLING_ADDRESS1_INPUT).send_keys(address1)
-        self.driver.find_element(*self.BILLING_ZIP_INPUT).send_keys(zip_code)
-        self.driver.find_element(*self.BILLING_PHONE_INPUT).send_keys(phone)
-        self.wait.until(EC.element_to_be_clickable(self.BILLING_CONTINUE_BUTTON)).click()
+            self.driver.find_element(*self.BILLING_CITY_INPUT).send_keys(city)
+            self.driver.find_element(*self.BILLING_ADDRESS1_INPUT).send_keys(address1)
+            self.driver.find_element(*self.BILLING_ZIP_INPUT).send_keys(zip_code)
+            self.driver.find_element(*self.BILLING_PHONE_INPUT).send_keys(phone)
+            self.wait.until(EC.element_to_be_clickable(self.BILLING_CONTINUE_BUTTON)).click()
+        except TimeoutException as e:
+            pytest.fail(f"Error de time out al rellenar la dirección de facturación. Causa{e} ")
 
     def click_shipping_address_continue(self):
         self.wait.until(EC.element_to_be_clickable(self.SHIPPING_ADDRESS_CONTINUE_BUTTON)).click()
@@ -115,7 +120,10 @@ class PurchasePage:
         self.wait.until(EC.element_to_be_clickable(self.PAYMENT_INFO_CONTINUE_BUTTON)).click()
         
     def confirm_order(self):
-        self.wait.until(EC.element_to_be_clickable(self.CONFIRM_BUTTON)).click()
+        try:
+            self.wait.until(EC.element_to_be_clickable(self.CONFIRM_BUTTON)).click()
+        except TimeoutException as e:
+            pytest.fail(f"Error de timeout al confirmar la orden. Causa: {e}")
     
     def verify_order_success(self):
         self.wait.until(EC.text_to_be_present_in_element(self.SUCCESS_MESSAGE, "Your order has been successfully processed!"))

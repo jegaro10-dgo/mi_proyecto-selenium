@@ -77,6 +77,3 @@ def test_guest_checkout(driver):
         driver.save_screenshot(screenshot_filename)
         pytest.fail(f"La prueba End-to-End falló. Se guardó una captura de pantalla: {screenshot_filename}. Causa: {e}")
     
-    finally:
-        # El fixture se encarga de cerrar el navegador. No es necesario `driver.quit()` aquí.
-        print("El navegador se cerrará automáticamente al finalizar la prueba.")
