@@ -1,7 +1,5 @@
 import pytest
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from pages.purchase_page import PurchasePage  # Importamos la clase de página refactorizada
 
 @pytest.fixture(scope="module")
@@ -11,8 +9,13 @@ def setup_teardown():
     Utiliza el patrón de Page Object Model.
     """
     print("\nIniciando el navegador...")
-    # Usa webdriver_manager para gestionar automáticamente el driver de Chrome
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    # Usa una ruta común para el driver de Chrome en entornos de CI como GitHub Actions.
+    # Esto elimina la dependencia de 'webdriver_manager'.
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    driver = webdriver.Chrome(options=options)
     driver.maximize_window()
     yield driver
     print("\nCerrando el navegador...")
@@ -76,4 +79,3 @@ def test_end_to_end_purchase_flow(setup_teardown):
     purchase_page.verify_order_success()
 
     print("\n¡Prueba de flujo de compra completada con éxito!")
-
