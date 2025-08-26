@@ -37,7 +37,7 @@ class PurchasePage:
         self.BILLING_ADDRESS1_INPUT = (By.ID, "BillingNewAddress_Address1")
         self.BILLING_ZIP_CODE_INPUT = (By.ID, "BillingNewAddress_ZipPostalCode")
         self.BILLING_PHONE_INPUT = (By.ID, "BillingNewAddress_PhoneNumber")
-        self.BILLING_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#billing-buttons-container .new-address-next-step-button")
+        self.BILLING_CONTINUE_BUTTON = (By.CSS_SELECTOR, "#billing-buttons-container .button-1 new-address-next-step-button")
         
         # Locators del método de envío
         self.SHIPPING_METHOD_RADIO = (By.ID, "shippingoption_0")
