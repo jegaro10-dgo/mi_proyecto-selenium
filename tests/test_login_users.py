@@ -1,5 +1,4 @@
 import pytest
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -40,9 +39,6 @@ def test_login_with_screenshot_on_fail(driver, user_data):
     """
     EMAIL = user_data['email']
     PASSWORD = user_data['password']
-
-    # Configurar el WebDriver para Chrome
-    driver = webdriver.Chrome()
 
     try:
         # Navegar a la página de inicio de sesión
