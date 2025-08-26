@@ -2,26 +2,36 @@ import pytest
 import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+
 
 @pytest.fixture(scope="function")
-def driver(request):
-    """Crea una instancia de WebDriver y la cierra al finalizar la prueba."""
-    print("\nIniciando el navegador...")
-    
-    # Configuración para ejecutar en modo headless
+def driver():
+    """
+    Este fixture configura el driver de Selenium.
+    Se ejecuta una vez por cada prueba ('function').
+    """
+    # Configuración de las opciones del navegador
     chrome_options = Options()
+    # Ejecutar en modo sin cabeza (headless), lo cual es necesario en entornos de CI como GitHub Actions.
     chrome_options.add_argument("--headless")
+    # Argumentos adicionales para una ejecución más robusta en entornos de servidor.
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     
-    driver = webdriver.Chrome(options=chrome_options)
-    driver.implicitly_wait(10)
-    driver.set_window_size(1929, 1080)
-    yield driver  # Esto es lo que se retorna a la prueba
+    # Ruta al ejecutable de Chromium en el servidor de GitHub Actions.
+    # Esta ruta es fija en el entorno de Ubuntu de GitHub Actions.
+    service = Service(executable_path="/usr/lib/chromium-browser/chromedriver")
+
+    # Iniciar el driver
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     
-    # Esta parte se ejecuta después de que la prueba termina
-    print("\nCerrando el navegador...")
+    # 'yield' devuelve el control a la prueba que lo llamó.
+    yield driver
+    
+    # Después de que la prueba se ejecuta, este código limpia y cierra el navegador.
     driver.quit()
+
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
