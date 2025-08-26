@@ -1,5 +1,7 @@
 # pages/purchase_page.py
 import pytest
+# pages/purchase_page.py
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,7 +13,7 @@ class PurchasePage:
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 15)  # Aumenta el tiempo de espera a 15 segundos
         self.URL = "https://demowebshop.tricentis.com"
-
+        
         # Locators
         self.SHOPPING_CART_LINK = (By.XPATH, "//span[text()='Shopping cart']")
         self.TERMS_OF_SERVICE_CHECKBOX = (By.ID, "termsofservice")
@@ -72,6 +74,9 @@ class PurchasePage:
         Acepta los términos de servicio y hace clic en el botón de checkout.
         """
         try:
+            # Esperar a que la URL del carrito se cargue correctamente
+            self.wait.until(EC.url_contains("/cart"))
+            
             # 1. Hacer scroll hasta el elemento para asegurar que esté visible
             print("Haciendo scroll hasta el checkbox de términos de servicio.")
             terms_checkbox = self.wait.until(EC.presence_of_element_located(self.TERMS_OF_SERVICE_CHECKBOX))
