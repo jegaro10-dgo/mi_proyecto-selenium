@@ -18,6 +18,11 @@ class PurchasePage:
         self.CHECKOUT_BUTTON = (By.ID, "checkout")
         self.CHECKOUT_AS_GUEST_BUTTON = (By.CSS_SELECTOR, ".checkout-as-guest-button")
         
+        # New locators for product search and add to cart
+        self.SEARCH_INPUT = (By.ID, "small-searchterms")
+        self.SEARCH_BUTTON = (By.CSS_SELECTOR, ".search-box-button")
+        self.ADD_TO_CART_BUTTON = (By.ID, "add-to-cart-button-31")
+
         # Billing address locators
         self.BILLING_FIRST_NAME_INPUT = (By.ID, "BillingNewAddress_FirstName")
         self.BILLING_LAST_NAME_INPUT = (By.ID, "BillingNewAddress_LastName")
@@ -192,3 +197,29 @@ class PurchasePage:
             self.wait.until(EC.presence_of_element_located(self.ORDER_SUCCESS_MESSAGE))
         except TimeoutException as e:
             pytest.fail(f"Error de Timeout al verificar el mensaje de éxito. Causa: {e}")
+    
+    def write_name_of_product(self, product_name):
+        """
+        Busca un producto por su nombre.
+        """
+        try:
+            print(f"Buscando el producto: {product_name}")
+            self.wait.until(EC.presence_of_element_located(self.SEARCH_INPUT)).send_keys(product_name)
+            self.wait.until(EC.element_to_be_clickable(self.SEARCH_BUTTON)).click()
+        except (NoSuchElementException, TimeoutException) as e:
+            pytest.fail(f"Error al buscar el producto '{product_name}'. Un elemento no fue encontrado o la espera falló. Causa: {e}")
+
+    def add_product_to_cart(self):
+        """
+        Hace clic en el enlace del producto y luego en el botón de añadir al carrito.
+        """
+        try:
+            print("Haciendo clic en el producto...")
+            # El producto tiene un enlace con el texto que contiene el nombre, por lo que usaremos ese localizador
+            product_link = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//a[text()='14.1-inch Laptop']")))
+            product_link.click()
+            
+            print("Haciendo clic en el botón 'Add to cart'...")
+            self.wait.until(EC.element_to_be_clickable(self.ADD_TO_CART_BUTTON)).click()
+        except (NoSuchElementException, TimeoutException) as e:
+            pytest.fail(f"Error al añadir el producto al carrito. No se encontró el enlace o el botón. Causa: {e}")
