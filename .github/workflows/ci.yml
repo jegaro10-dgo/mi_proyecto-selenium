@@ -43,7 +43,9 @@ jobs:
     - name: Subir reporte de prueba
       # 'if: always()' asegura que este paso se ejecute incluso si la prueba falla.
       if: always()
-      uses: actions/upload-artifact@v2
+      # Se ha actualizado la versión de la acción a v4 para evitar el error de depreciación.
+      # La sintaxis de los parámetros también ha cambiado ligeramente.
+      uses: actions/upload-artifact@v4
       with:
         # 'name' es el nombre que se mostrará para el reporte en la página de GitHub Actions.
         name: html-reporte-de-prueba
