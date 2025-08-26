@@ -34,7 +34,7 @@ def get_users(filename="user_data.txt"):
 
 # --- Parte 2: El caso de prueba de pytest ---
 @pytest.mark.parametrize("user_data", get_users())
-def test_login_with_screenshot_on_fail(user_data):
+def test_login_with_screenshot_on_fail(driver, user_data):
     """
     Prueba que el inicio de sesión sea exitoso para cada usuario en la lista.
     """
@@ -46,6 +46,7 @@ def test_login_with_screenshot_on_fail(user_data):
 
     try:
         # Navegar a la página de inicio de sesión
+        print(f"Probando el inicio de sesión para el usuario: {EMAIL}")
         driver.get("https://demowebshop.tricentis.com/login")
 
         # Rellenar los campos del formulario de inicio de sesión
@@ -62,6 +63,7 @@ def test_login_with_screenshot_on_fail(user_data):
 
         # Verificar que el inicio de sesión fue exitoso
         wait.until(EC.presence_of_element_located((By.XPATH, f"//a[contains(text(), '{EMAIL}')]")))
+        print(f"¡Inicio de sesión exitoso para el usuario: {EMAIL}!")
 
     except Exception as e:
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -70,4 +72,4 @@ def test_login_with_screenshot_on_fail(user_data):
         pytest.fail(f"La prueba de inicio de sesión falló para el usuario {EMAIL}. Se guardó una captura de pantalla: {screenshot_filename}. Causa: {e}")
     
     finally:
-        driver.quit()
+        pass

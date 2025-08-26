@@ -3,8 +3,8 @@ import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-@pytest.fixture()
-def driver():
+@pytest.fixture(scope="function")
+def driver(request):
     """Crea una instancia de WebDriver y la cierra al finalizar la prueba."""
     print("\nIniciando el navegador...")
     
@@ -16,6 +16,7 @@ def driver():
     
     driver = webdriver.Chrome(options=chrome_options)
     driver.implicitly_wait(10)
+    driver.set_window_size(1929, 1080)
     yield driver  # Esto es lo que se retorna a la prueba
     
     # Esta parte se ejecuta después de que la prueba termina

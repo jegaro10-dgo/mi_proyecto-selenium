@@ -57,6 +57,9 @@ def test_end_to_end_purchase_flow(driver):
     
     print("Rellenando la dirección de facturación...")
     purchase_page.fill_billing_address(
+        first_name="Jesus",
+        last_name="Garcia Rojas",
+        email=email,
         country="Mexico",
         #state="New York",
         city="New York",
