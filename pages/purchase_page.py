@@ -131,22 +131,25 @@ class PurchasePage:
 
     def click_shipping_address_continue(self):
         """
-        Hace clic en el botón de continuar en la dirección de facturación.
+        Hace clic en el botón de continuar en la dirección de facturación y espera la siguiente página.
         """
         try:
             print("Haciendo clic en continuar de la dirección de facturación.")
-            self.wait.until(EC.element_to_be_clickable(self.BILLING_CONTINUE_BUTTON)).click()
+            # Espera a que el botón sea clicable antes de hacer clic
+            continue_button = self.wait.until(EC.element_to_be_clickable(self.BILLING_CONTINUE_BUTTON))
+            continue_button.click()
+            
+            # Espera explícitamente a que el siguiente elemento esté presente
+            self.wait.until(EC.element_to_be_clickable(self.SHIPPING_METHOD_RADIO))
+            print("Página de método de envío cargada con éxito.")
         except TimeoutException as e:
-            pytest.fail(f"Error de Timeout al hacer clic en 'Continue' en la dirección de facturación. Causa: {e}")
+            pytest.fail(f"Error de Timeout al hacer clic en 'Continue' en la dirección de facturación o al esperar la siguiente página. Causa: {e}")
 
     def select_shipping_method(self):
         """
         Selecciona el método de envío.
         """
         try:
-            print("Esperando que la página de método de envío cargue.")
-            self.wait.until(EC.url_contains("shippingmethod"))
-            
             print("Seleccionando el método de envío.")
             self.wait.until(EC.element_to_be_clickable(self.SHIPPING_METHOD_RADIO)).click()
             self.wait.until(EC.element_to_be_clickable(self.SHIPPING_METHOD_CONTINUE_BUTTON)).click()
