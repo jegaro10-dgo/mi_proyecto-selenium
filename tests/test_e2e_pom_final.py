@@ -1,6 +1,9 @@
 import pytest
 from selenium import webdriver
-from pages.purchase_page import PurchasePage  # Importamos la clase de página refactorizada
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from pages.purchase_page import PurchasePage
 
 @pytest.fixture(scope="module")
 def setup_teardown():
@@ -39,8 +42,12 @@ def test_end_to_end_purchase_flow(setup_teardown):
     purchase_page.add_product_by_name_and_add_to_cart("14.1-inch Laptop")
     
     # Paso 3: Navegar al carrito y proceder al checkout
-    print("Paso 3: Navegando al carrito de compras y procediendo al checkout.")
-    purchase_page.go_to_shopping_cart()
+    # Eliminamos el driver.get() y en su lugar esperamos a que el enlace del carrito sea clicable.
+    print("Paso 3: Esperando y haciendo clic en el enlace del carrito de compras para proceder al checkout.")
+    wait = WebDriverWait(driver, 15)
+    shopping_cart_link = wait.until(EC.element_to_be_clickable(purchase_page.SHOPPING_CART_LINK))
+    shopping_cart_link.click()
+
     purchase_page.checkout()
     purchase_page.checkout_as_guest()
 
