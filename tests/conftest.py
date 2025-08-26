@@ -19,19 +19,15 @@ def driver():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     
-    # Ruta al ejecutable de Chromium en el servidor de GitHub Actions.
-    # Esta ruta es fija en el entorno de Ubuntu de GitHub Actions.
-    service = Service(executable_path="/usr/lib/chromium-browser/chromedriver")
-
     # Iniciar el driver
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    # Selenium ahora gestionará la instalación del driver automáticamente.
+    driver = webdriver.Chrome(options=chrome_options)
     
     # 'yield' devuelve el control a la prueba que lo llamó.
     yield driver
     
     # Después de que la prueba se ejecuta, este código limpia y cierra el navegador.
     driver.quit()
-
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):

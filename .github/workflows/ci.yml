@@ -29,27 +29,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    # Nuevo paso para instalar el navegador Chromium y su driver
-    - name: Instalar Chromium
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y chromium-browser
+    # Utiliza una acción dedicada para instalar el navegador Chrome y su driver.
+    # Esta acción se encarga de la compatibilidad y la ruta automáticamente.
+    - name: Instalar Google Chrome
+      uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: 'stable'
     
     - name: Ejecutar pruebas con Pytest y generar reporte HTML
       run: |
-        # Pytest ejecuta las pruebas y las opciones '--html' y '--self-contained-html' 
-        # le dicen que genere un reporte llamado 'report.html' que contiene todo lo que necesita en un solo archivo.
-        # Ya no se necesita el argumento --driver-path porque se configura en conftest.py.
         pytest --html=report.html --self-contained-html
 
     - name: Subir reporte de prueba
-      # 'if: always()' asegura que este paso se ejecute incluso si la prueba falla.
       if: always()
-      # Se ha actualizado la versión de la acción a v4 para evitar el error de depreciación.
-      # La sintaxis de los parámetros también ha cambiado ligeramente.
       uses: actions/upload-artifact@v4
       with:
-        # 'name' es el nombre que se mostrará para el reporte en la página de GitHub Actions.
         name: html-reporte-de-prueba
-        # 'path' es el archivo que se subirá.
         path: report.html
