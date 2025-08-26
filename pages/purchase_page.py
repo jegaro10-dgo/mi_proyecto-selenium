@@ -209,6 +209,7 @@ class PurchasePage:
         """
         try:
             print(f"Buscando el producto: {product_name}")
+            # Aumentar el tiempo de espera para el input de búsqueda para darle tiempo a cargar
             self.wait.until(EC.presence_of_element_located(self.SEARCH_INPUT)).send_keys(product_name)
             self.wait.until(EC.element_to_be_clickable(self.SEARCH_BUTTON)).click()
         except (NoSuchElementException, TimeoutException) as e:
