@@ -209,8 +209,11 @@ class PurchasePage:
         """
         try:
             print(f"Buscando el producto: {product_name}")
-            # Aumentar el tiempo de espera para el input de búsqueda para darle tiempo a cargar
-            self.wait.until(EC.presence_of_element_located(self.SEARCH_INPUT)).send_keys(product_name)
+            # Realizar scroll al elemento de búsqueda antes de interactuar con él
+            search_input_element = self.wait.until(EC.presence_of_element_located(self.SEARCH_INPUT))
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", search_input_element)
+            
+            search_input_element.send_keys(product_name)
             self.wait.until(EC.element_to_be_clickable(self.SEARCH_BUTTON)).click()
         except (NoSuchElementException, TimeoutException) as e:
             pytest.fail(f"Error al buscar el producto '{product_name}'. Un elemento no fue encontrado o la espera falló. Causa: {e}")
@@ -226,6 +229,10 @@ class PurchasePage:
             product_link.click()
             
             print("Haciendo clic en el botón 'Add to cart'...")
-            self.wait.until(EC.element_to_be_clickable(self.ADD_TO_CART_BUTTON)).click()
+            # Realizar scroll al botón 'Add to cart' antes de hacer clic
+            add_to_cart_button_element = self.wait.until(EC.element_to_be_clickable(self.ADD_TO_CART_BUTTON))
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", add_to_cart_button_element)
+            
+            add_to_cart_button_element.click()
         except (NoSuchElementException, TimeoutException) as e:
             pytest.fail(f"Error al añadir el producto al carrito. No se encontró el enlace o el botón. Causa: {e}")
