@@ -25,11 +25,15 @@ jobs:
 
       - name: ZAP Baseline Scan
         id: zap
-        uses: zaproxy/action-baseline@v0.12.0
+        uses: zaproxy/action-baseline@v0.13.0
         with:
           target: 'http://testphp.vulnweb.com/'
           cmd_options: '-r reports/zap-report.html'
           
+      # Add a debug step to list files in the directory
+      - name: List Files for Debugging
+        run: ls -R
+
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
