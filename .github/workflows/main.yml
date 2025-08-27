@@ -35,16 +35,17 @@ jobs:
       run: |
         docker build -t mi-app-web .
 
-    # Crea una red de Docker para que los contenedores puedan comunicarse.
+    # Crea una red de Docker y ejecuta el contenedor de la aplicación sin --rm.
+    # El contenedor se detendrá y eliminará en un paso posterior.
     - name: Crear red de Docker y ejecutar el contenedor de la aplicación
       run: |
         docker network create zap-scan-network
-        docker run -d --rm --name mi-app --network zap-scan-network mi-app-web
+        docker run -d --name mi-app --network zap-scan-network mi-app-web
         
         echo "Esperando 30 segundos para que el contenedor de la aplicación inicie completamente..."
         sleep 30
         
-    # Obtiene la dirección IP del contenedor de la aplicación
+    # Obtiene la dirección IP del contenedor de la aplicación.
     - name: Obtener la dirección IP del contenedor de la aplicación
       id: get_ip
       run: |
@@ -70,3 +71,12 @@ jobs:
       with:
         name: zap-report-html
         path: report_html.html
+        
+    # Limpia los contenedores al final, incluso si los pasos anteriores fallaron.
+    - name: Limpiar contenedores
+      if: always()
+      run: |
+        echo "Deteniendo y eliminando contenedores..."
+        docker stop mi-app || true
+        docker rm mi-app || true
+        docker network rm zap-scan-network || true
