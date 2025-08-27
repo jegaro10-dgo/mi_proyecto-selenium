@@ -30,12 +30,12 @@ jobs:
         echo "Ejecutando pruebas de Pytest..."
         pytest
     
-    # Este paso construye la imagen de Docker de tu aplicación.
+    # Construye la imagen de Docker de tu aplicación.
     - name: Construir la imagen de Docker de la aplicación
       run: |
         docker build -t mi-app-web .
 
-    # Este paso crea una red de Docker para que los contenedores puedan comunicarse.
+    # Crea una red de Docker para que los contenedores puedan comunicarse.
     - name: Crear red de Docker y ejecutar el contenedor de la aplicación
       run: |
         docker network create zap-scan-network
@@ -44,11 +44,18 @@ jobs:
         echo "Esperando 30 segundos para que el contenedor de la aplicación inicie completamente..."
         sleep 30
         
-    - name: Escanear la aplicación con OWASP ZAP
-      # Aquí, ZAP se une a la misma red y se conecta a la aplicación usando el nombre del contenedor.
-      # Esto elimina problemas de conexión entre contenedores.
-      uses: zaproxy/action-baseline@v0.12.0
+    # Ejecuta ZAP manualmente dentro de la misma red de Docker.
+    - name: Ejecutar escaneo de seguridad con ZAP
+      run: |
+        docker run --rm --network zap-scan-network \
+          -v ${{ github.workspace }}:/zap/wrk \
+          ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+          -t http://mi-app:5000 \
+          -J report_json.json \
+          -r report_html.html
+          
+    - name: Subir reporte de seguridad (HTML)
+      uses: actions/upload-artifact@v4
       with:
-        target: 'http://mi-app:5000'
-        docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
-        docker_options: --network zap-scan-network
+        name: zap-report-html
+        path: report_html.html
