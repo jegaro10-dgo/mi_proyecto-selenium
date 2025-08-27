@@ -30,12 +30,10 @@ jobs:
         echo "Ejecutando pruebas de Pytest..."
         pytest
     
-    # Construye la imagen de Docker de tu aplicación.
     - name: Construir la imagen de Docker de la aplicación
       run: |
         docker build -t mi-app-web .
 
-    # Crea una red de Docker y ejecuta el contenedor de la aplicación.
     - name: Crear red de Docker y ejecutar el contenedor de la aplicación
       run: |
         docker network create zap-scan-network
@@ -44,21 +42,23 @@ jobs:
         echo "Esperando 30 segundos para que el contenedor de la aplicación inicie completamente..."
         sleep 30
         
-    # Obtiene la dirección IP del contenedor de la aplicación y la guarda en una variable de entorno.
-    - name: Guardar la dirección IP del contenedor
-      id: get_ip
-      run: |
-        IP_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mi-app)
-        echo "ZAP_TARGET_IP=$IP_ADDRESS" >> $GITHUB_ENV
+    # --- PASO ELIMINADO ---
+    # Ya no necesitamos obtener la IP, usaremos el nombre del contenedor directamente.
+    # - name: Guardar la dirección IP del contenedor
+    #   id: get_ip
+    #   run: |
+    #     IP_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mi-app)
+    #     echo "ZAP_TARGET_IP=$IP_ADDRESS" >> $GITHUB_ENV
 
-    # Ejecuta ZAP, usando la variable de entorno que se guardó en el paso anterior.
+    # --- PASO MODIFICADO ---
+    # Usamos "mi-app" como el hostname, que Docker resolverá a la IP correcta.
     - name: Ejecutar escaneo de seguridad con ZAP
       run: |
         docker run --rm --name zap-scanner --network zap-scan-network \
           -v $(pwd):/zap/wrk \
           --user root \
           ghcr.io/zaproxy/zaproxy:stable \
-          zap-baseline.py -t http://${{ env.ZAP_TARGET_IP }}:5000 \
+          zap-baseline.py -t http://mi-app:5000 \
           -J /zap/wrk/report_json.json -r /zap/wrk/report_html.html
         
     - name: Subir reporte de seguridad (HTML)
@@ -67,7 +67,6 @@ jobs:
         name: zap-report-html
         path: report_html.html
         
-    # Limpia los contenedores al final, incluso si los pasos anteriores fallaron.
     - name: Limpiar contenedores
       if: always()
       run: |
