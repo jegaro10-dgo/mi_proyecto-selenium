@@ -14,15 +14,15 @@ class WebsiteUser(HttpUser):
     @task(3)
     def index_page(self):
         """
-        Esta tarea simula a un usuario visitando la página de inicio.
+        Esta tarea simula a un usuario visitando la página de categoria de computadoras.
         La carga de trabajo de esta tarea es 3 veces más probable que la de la otra tarea.
         """
-        self.client.get("/", name="Homepage")
+        self.client.get("/", name="computers")
 
     @task(1)
     def view_product(self):
         """
-        Esta tarea simula a un usuario navegando a una página de producto.
+        Esta tarea simula a un usuario navegando a una página de producto en este caso la laptop.
         """
         # Se ha corregido la URL del producto a una que existe actualmente.
         self.client.get("/141-inch-laptop", name="141-inch-laptop")
