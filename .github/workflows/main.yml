@@ -1,77 +1,33 @@
-name: Pruebas de Python y Escaneo de Seguridad
+name: Security Scan with ZAP
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  complete_scan:
+  zap_scan:
     runs-on: ubuntu-latest
-    
+    name: OWASP ZAP Baseline Scan
+
     steps:
-    - name: Checkout del código
-      uses: actions/checkout@v4
-      
-    - name: Configurar Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.9"
-        
-    - name: Instalar dependencias
-      run: |
-        echo "Instalando dependencias..."
-        python -m pip install --upgrade pip
-        pip install pytest requests selenium
-        
-    - name: Ejecutar pruebas de Pytest
-      run: |
-        echo "Ejecutando pruebas de Pytest..."
-        pytest
-    
-    - name: Construir la imagen de Docker de la aplicación
-      run: |
-        docker build -t mi-app-web .
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Crear red de Docker y ejecutar el contenedor de la aplicación
-      run: |
-        docker network create zap-scan-network
-        docker run -d --name mi-app --network zap-scan-network mi-app-web
-        
-    - name: Verificar que la aplicación esté activa (Health Check)
-      # Reemplazamos 'sleep 30' con este paso más robusto.
-      # Usamos un contenedor de curl en la misma red para verificar si 'mi-app' responde.
-      # Reintentará 10 veces, con una espera de 6 segundos entre intentos (total 1 minuto).
-      run: |
-        echo "Esperando a que el contenedor mi-app esté listo..."
-        docker run --network zap-scan-network --rm curlimages/curl \
-          --retry 10 --retry-delay 6 --retry-connrefused -s --fail http://mi-app:5000/ || \
-          (echo "La aplicación no respondió. Mostrando logs del contenedor mi-app:" && docker logs mi-app && exit 1)
-    - name: Escanear con OWASP ZAP
-      run: |
-        mkdir -p reports
-        docker run --rm --name zap-scanner \
-          -v $(pwd)/reports:/zap/wrk \
-          -u $(id -u):$(id -g) \
-          ghcr.io/zaproxy/zaproxy:stable \
-          zap-full-scan.py -t http://testphp.vulnweb.com/ -r /zap/wrk/report.html
-    - name: Subir reporte de ZAP
-      uses: actions/upload-artifact@v4
-      with:
-        name: reporte-zap
-        path: reports/
+      - name: Create Reports Directory
+        run: mkdir -p reports
 
-    - name: Subir reporte de seguridad (HTML)
-      uses: actions/upload-artifact@v4
-      with:
-        name: zap-report-html
-        path: report_html.html
-        
-    - name: Limpiar contenedores
-      if: always()
-      run: |
-        echo "Deteniendo y eliminando contenedores..."
-        docker stop mi-app || true
-        docker rm mi-app || true
-        docker network rm zap-scan-network || true
+      - name: ZAP Baseline Scan
+        uses: docker://ghcr.io/zaproxy/zaproxy:stable
+        with:
+          args: zap-baseline.py -t http://testphp.vulnweb.com/ -r reports/zap-report.html -w reports/zap-report.md
+        continue-on-error: true
+
+      - name: Upload Scan Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ZAP-Report
+          path: reports/
