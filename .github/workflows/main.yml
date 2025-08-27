@@ -44,14 +44,21 @@ jobs:
         echo "Esperando 30 segundos para que el contenedor de la aplicación inicie completamente..."
         sleep 30
         
-    # Ejecuta ZAP, resolviendo la IP del contenedor de la aplicación en la misma línea.
+    # Obtiene la dirección IP del contenedor de la aplicación y la guarda en una variable de entorno.
+    - name: Guardar la dirección IP del contenedor
+      id: get_ip
+      run: |
+        IP_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mi-app)
+        echo "ZAP_TARGET_IP=$IP_ADDRESS" >> $GITHUB_ENV
+
+    # Ejecuta ZAP, usando la variable de entorno que se guardó en el paso anterior.
     - name: Ejecutar escaneo de seguridad con ZAP
       run: |
         docker run --rm --name zap-scanner --network zap-scan-network \
           -v $(pwd):/zap/wrk \
           --user root \
           ghcr.io/zaproxy/zaproxy:stable \
-          zap-baseline.py -t http://$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mi-app):5000 \
+          zap-baseline.py -t http://${{ env.ZAP_TARGET_IP }}:5000 \
           -J /zap/wrk/report_json.json -r /zap/wrk/report_html.html
         
     - name: Subir reporte de seguridad (HTML)
@@ -68,5 +75,3 @@ jobs:
         docker stop mi-app || true
         docker rm mi-app || true
         docker network rm zap-scan-network || true
-
-        # que ya funcione
