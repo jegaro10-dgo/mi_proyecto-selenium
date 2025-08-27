@@ -49,14 +49,12 @@ jobs:
           --retry 10 --retry-delay 6 --retry-connrefused -s --fail http://mi-app:5000/ || \
           (echo "La aplicación no respondió. Mostrando logs del contenedor mi-app:" && docker logs mi-app && exit 1)
         
-    - name: Ejecutar escaneo de seguridad con ZAP
+    - name: Escanear con OWASP ZAP
       run: |
         docker run --rm --name zap-scanner --network zap-scan-network \
-          -v $(pwd):/zap/wrk \
-          --user root \
+          -v $(pwd)/reports:/zap/wrk \
           ghcr.io/zaproxy/zaproxy:stable \
-          zap-baseline.py -t http://mi-app:5000 \
-          -J /zap/wrk/report_json.json -r /zap/wrk/report_html.html
+          zap-full-scan.py -t http://mi-app:5000
         
     - name: Subir reporte de seguridad (HTML)
       uses: actions/upload-artifact@v4
