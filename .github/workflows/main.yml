@@ -57,6 +57,7 @@ jobs:
       run: |
         docker run --rm --name zap-scanner --network zap-scan-network \
           -v $(pwd):/zap/wrk \
+          --user root \
           ghcr.io/zaproxy/zaproxy:stable \
           zap-baseline.py -t http://${{ env.IP_APP }}:5000 -J /zap/wrk/report_json.json -r /zap/wrk/report_html.html
         
