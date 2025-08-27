@@ -29,9 +29,8 @@ jobs:
         echo "Ejecutando todas las pruebas en la carpeta 'tests'..."
         pytest
 
-  # Tarea de escaneo de seguridad (versión 3, corregida)
+  # Tarea de escaneo de seguridad (versión 4, corregida)
   zap_scan:
-    # Esta tarea solo se ejecuta si la tarea de 'build' es exitosa.
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -42,7 +41,6 @@ jobs:
         # Reemplaza 'app.py' con el nombre de tu archivo principal si es diferente.
         run: |
           python app.py &
-          echo "Esperando 10 segundos para que la aplicación se inicie..."
           sleep 10
         
       - name: Escanear la aplicación con OWASP ZAP
