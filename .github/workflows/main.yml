@@ -55,7 +55,7 @@ jobs:
           -v $(pwd)/reports:/zap/wrk \
           -u $(id -u):$(id -g) \
           ghcr.io/zaproxy/zaproxy:stable \
-          zap-full-scan.py -t https://bebbia.com/portal/ -r /zap/wrk/report.html
+          zap-full-scan.py -t http://testphp.vulnweb.com/ -r /zap/wrk/report.html
     - name: Subir reporte de ZAP
       uses: actions/upload-artifact@v4
       with:
