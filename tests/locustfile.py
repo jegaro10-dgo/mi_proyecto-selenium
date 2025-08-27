@@ -24,4 +24,5 @@ class WebsiteUser(HttpUser):
         """
         Esta tarea simula a un usuario navegando a una página de producto.
         """
-        self.client.get("/digital-l1", name="Digital L1 Product")
+        # Se ha corregido la URL del producto a una que existe actualmente.
+        self.client.get("/14.1-inch-laptop", name="14.1-inch-laptop")
