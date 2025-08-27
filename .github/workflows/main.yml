@@ -35,8 +35,7 @@ jobs:
       run: |
         docker build -t mi-app-web .
 
-    # Crea una red de Docker y ejecuta el contenedor de la aplicación sin --rm.
-    # El contenedor se detendrá y eliminará en un paso posterior.
+    # Crea una red de Docker y ejecuta el contenedor de la aplicación.
     - name: Crear red de Docker y ejecutar el contenedor de la aplicación
       run: |
         docker network create zap-scan-network
@@ -53,19 +52,14 @@ jobs:
         echo "La IP del contenedor es: $IP"
         echo "IP_APP=$IP" >> $GITHUB_ENV
         
-    # Ejecuta ZAP en un nuevo contenedor y usa la IP de la aplicación.
+    # Ejecuta ZAP con un volumen montado para guardar los reportes directamente.
     - name: Ejecutar escaneo de seguridad con ZAP
       run: |
         docker run --rm --name zap-scanner --network zap-scan-network \
+          -v $(pwd):/zap/wrk \
           ghcr.io/zaproxy/zaproxy:stable \
-          zap-baseline.py -t http://${{ env.IP_APP }}:5000 -J /home/zap/report_json.json -r /home/zap/report_html.html
+          zap-baseline.py -t http://${{ env.IP_APP }}:5000 -J /zap/wrk/report_json.json -r /zap/wrk/report_html.html
         
-    # Copia los archivos de reporte del contenedor a tu sistema de archivos de GitHub Actions.
-    - name: Copiar reportes de ZAP
-      run: |
-        docker cp zap-scanner:/home/zap/report_json.json .
-        docker cp zap-scanner:/home/zap/report_html.html .
-          
     - name: Subir reporte de seguridad (HTML)
       uses: actions/upload-artifact@v4
       with:
