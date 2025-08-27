@@ -1,4 +1,4 @@
-name: Security Scan with ZAP
+name: ZAP Baseline Scan
 
 on:
   push:
@@ -11,23 +11,28 @@ on:
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
-    name: OWASP ZAP Baseline Scan
-
+    name: Scan the web application
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # This is required to get a clean checkout of the repository,
+          # and not just a single commit.
+          fetch-depth: 0
 
       - name: Create Reports Directory
         run: mkdir -p reports
 
       - name: ZAP Baseline Scan
-        uses: docker://ghcr.io/zaproxy/zaproxy:stable
+        id: zap
+        uses: zaproxy/action-baseline@v0.12.0
         with:
-          args: zap-baseline.py -t http://testphp.vulnweb.com/ -r reports/zap-report.html -w reports/zap-report.md
-        continue-on-error: true
-
-      - name: Upload Scan Report
-        uses: actions/upload-artifact@v3
+          target: 'http://testphp.vulnweb.com/'
+          cmd_options: '-r reports/zap-report.html'
+          
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
         with:
           name: ZAP-Report
           path: reports/
+          retention-days: 5
