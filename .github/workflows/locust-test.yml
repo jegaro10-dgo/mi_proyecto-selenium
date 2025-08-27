@@ -3,14 +3,24 @@
 name: Pruebas de Carga con Locust
 
 on:
+  # 1. Ejecutar solo cuando hay cambios en el archivo locustfile.py
+  # Esto evita que las pruebas de carga se ejecuten en cada 'push'
+  # si el cambio no está relacionado con el rendimiento.
   push:
     branches:
       - main
       - master
+    paths:
+      - 'locustfile.py'
   pull_request:
     branches:
       - main
       - master
+    paths:
+      - 'locustfile.py'
+  
+  # 2. Permite la ejecución manual del flujo de trabajo desde la interfaz de GitHub
+  workflow_dispatch:
 
 jobs:
   run-locust-tests:
