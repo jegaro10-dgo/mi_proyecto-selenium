@@ -29,3 +29,48 @@ jobs:
       run: |
         echo "Ejecutando todas las pruebas en la carpeta 'tests'..."
         pytest
+
+   # Nueva tarea para el escaneo de seguridad.
+  zap_scan:
+    # Esta tarea solo se ejecuta si la tarea de 'build' es exitosa.
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+        
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+          
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          # Instalar dependencias para la aplicación web
+          # Por ejemplo, 'pip install Flask' si usas Flask
+          # pip install Flask
+          
+      - name: Iniciar la aplicación web de prueba
+        # Nota: 'python app.py &' inicia el servidor en segundo plano
+        # 'sleep 10' espera a que el servidor esté completamente levantado
+        run: |
+          # Asegúrate de cambiar 'app.py' por el nombre de tu archivo principal.
+          # También, ajusta el comando según el framework que uses (ej: 'gunicorn app:app').
+          python app.py &
+          echo "Esperando 10 segundos para que la aplicación se inicie..."
+          sleep 10
+        
+      - name: Escanear la aplicación con OWASP ZAP
+        uses: zaproxy/action@v0.7.0
+        with:
+          # Aquí debes poner la URL de tu aplicación en el servidor local.
+          target: 'http://localhost:5000'
+          # Puedes especificar qué tipo de escaneo quieres
+          # full_scan, baseline_scan, api_scan
+          # baseline_scan es un escaneo rápido
+          # Puedes cambiar el formato del informe a JSON, HTML o XML
+          # Si no se especifica el formato del informe, será un informe en HTML.
+          # El informe se guardará en la carpeta artifacts.
+          # html_report: true
+
