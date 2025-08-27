@@ -45,18 +45,18 @@ jobs:
         sleep 30
         
     # Ejecuta ZAP en un nuevo contenedor y genera los reportes internamente.
-    # El escaneo falla porque no puede escribir en el directorio montado
-    # por lo que ahora generamos los archivos en una carpeta interna del contenedor
-    # y los copiamos posteriormente.
+    # Ahora creamos el directorio '/zap/wrk' antes del escaneo.
     - name: Ejecutar escaneo de seguridad con ZAP
       run: |
-        docker run --rm --name zap-scanner --network zap-scan-network ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://mi-app:5000 -J /home/zap/report_json.json -r /home/zap/report_html.html
+        docker run --rm --name zap-scanner --network zap-scan-network \
+          ghcr.io/zaproxy/zaproxy:stable \
+          /bin/bash -c "mkdir -p /zap/wrk && zap-baseline.py -t http://mi-app:5000 -J /zap/wrk/report_json.json -r /zap/wrk/report_html.html"
         
     # Copia los archivos de reporte del contenedor a tu sistema de archivos de GitHub Actions.
     - name: Copiar reportes de ZAP
       run: |
-        docker cp zap-scanner:/home/zap/report_json.json ./report_json.json
-        docker cp zap-scanner:/home/zap/report_html.html ./report_html.html
+        docker cp zap-scanner:/zap/wrk/report_json.json .
+        docker cp zap-scanner:/zap/wrk/report_html.html .
           
     - name: Subir reporte de seguridad (HTML)
       uses: actions/upload-artifact@v4
