@@ -16,7 +16,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          # Esto es necesario para obtener un checkout limpio del repositorio.
           fetch-depth: 0
 
       - name: ZAP Baseline Scan
@@ -24,8 +23,9 @@ jobs:
         uses: zaproxy/action-baseline@v0.13.0
         with:
           target: 'http://testphp.vulnweb.com/'
-          # Deshabilita la creación automática de incidencias para evitar errores de permisos.
+          # Deshabilitamos la creación de incidencias y cualquier interacción con la API.
           issue_unverified: false
+          repo_token: 'disabled'
           
       # Se carga el reporte HTML por defecto.
       - name: Upload ZAP Report
