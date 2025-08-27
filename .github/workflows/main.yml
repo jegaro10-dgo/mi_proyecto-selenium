@@ -44,16 +44,15 @@ jobs:
         echo "Esperando 30 segundos para que el contenedor de la aplicación inicie completamente..."
         sleep 30
         
-    # Ejecuta ZAP, obteniendo la IP del contenedor de la aplicación en el mismo comando.
+    # Ejecuta ZAP, resolviendo la IP del contenedor de la aplicación en la misma línea.
     - name: Ejecutar escaneo de seguridad con ZAP
       run: |
-        ZAP_TARGET_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mi-app)
-        
         docker run --rm --name zap-scanner --network zap-scan-network \
           -v $(pwd):/zap/wrk \
           --user root \
           ghcr.io/zaproxy/zaproxy:stable \
-          zap-baseline.py -t http://$ZAP_TARGET_IP:5000 -J /zap/wrk/report_json.json -r /zap/wrk/report_html.html
+          zap-baseline.py -t http://$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mi-app):5000 \
+          -J /zap/wrk/report_json.json -r /zap/wrk/report_html.html
         
     - name: Subir reporte de seguridad (HTML)
       uses: actions/upload-artifact@v4
