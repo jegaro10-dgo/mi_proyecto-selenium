@@ -62,10 +62,13 @@ def test_login_with_screenshot_on_fail(driver, user_data):
         print(f"¡Inicio de sesión exitoso para el usuario: {EMAIL}!")
 
     except Exception as e:
+        # Crea la carpeta "screenshots" si no existe
+        if not os.path.exists("screenshots"):
+            os.makedirs("screenshots")
+            
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        screenshot_filename = f"screenshot_failure_{timestamp}.png"
+        screenshot_filename = f"screenshots/login_failure_{timestamp}.png"
         driver.save_screenshot(screenshot_filename)
         pytest.fail(f"La prueba de inicio de sesión falló para el usuario {EMAIL}. Se guardó una captura de pantalla: {screenshot_filename}. Causa: {e}")
-    
     finally:
         pass
