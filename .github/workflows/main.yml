@@ -12,10 +12,16 @@ jobs:
   zap_scan:
     runs-on: ubuntu-latest
     name: Scan the web application
+    # Revoca todos los permisos para este job, evitando que la acción de ZAP
+    # acceda a la API de GitHub para crear incidencias.
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
+          # Esto es necesario para obtener un checkout limpio del repositorio.
           fetch-depth: 0
 
       - name: ZAP Baseline Scan
@@ -25,7 +31,6 @@ jobs:
           target: 'http://testphp.vulnweb.com/'
           # Deshabilitamos la creación de incidencias y cualquier interacción con la API.
           issue_unverified: false
-          repo_token: 'disabled'
           
       # Se carga el reporte HTML por defecto.
       - name: Upload ZAP Report
