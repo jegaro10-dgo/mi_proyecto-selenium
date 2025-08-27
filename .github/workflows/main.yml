@@ -29,18 +29,27 @@ jobs:
         echo "Ejecutando todas las pruebas en la carpeta 'tests'..."
         pytest
 
-  # Tarea de escaneo de seguridad (corregida)
+  # Tarea de escaneo de seguridad (versión 3, corregida)
   zap_scan:
+    # Esta tarea solo se ejecuta si la tarea de 'build' es exitosa.
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
         
-      - name: Escanear la aplicación web con OWASP ZAP
-        uses: zaproxy/action@v0.8.0
+      - name: Iniciar la aplicación web de prueba
+        # Reemplaza 'app.py' con el nombre de tu archivo principal si es diferente.
+        run: |
+          python app.py &
+          echo "Esperando 10 segundos para que la aplicación se inicie..."
+          sleep 10
+        
+      - name: Escanear la aplicación con OWASP ZAP
+        # Esta es la línea corregida. Apunta a la acción oficial y moderna.
+        uses: zaproxy/zap-action@v2.0.0
         with:
-          # Aquí debes poner la URL de tu aplicación en el servidor local o la de tu sitio web publicado.
+          # Aquí debes poner la URL de tu aplicación que se ejecuta localmente.
           target: 'http://localhost:5000'
           # Tipo de escaneo. El 'baseline_scan' es un escaneo rápido.
           cmd: 'baseline'
