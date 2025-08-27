@@ -39,19 +39,16 @@ jobs:
         docker network create zap-scan-network
         docker run -d --name mi-app --network zap-scan-network mi-app-web
         
-        echo "Esperando 30 segundos para que el contenedor de la aplicación inicie completamente..."
-        sleep 30
+    - name: Verificar que la aplicación esté activa (Health Check)
+      # Reemplazamos 'sleep 30' con este paso más robusto.
+      # Usamos un contenedor de curl en la misma red para verificar si 'mi-app' responde.
+      # Reintentará 10 veces, con una espera de 6 segundos entre intentos (total 1 minuto).
+      run: |
+        echo "Esperando a que el contenedor mi-app esté listo..."
+        docker run --network zap-scan-network --rm curlimages/curl \
+          --retry 10 --retry-delay 6 --retry-connrefused -s --fail http://mi-app:5000/ || \
+          (echo "La aplicación no respondió. Mostrando logs del contenedor mi-app:" && docker logs mi-app && exit 1)
         
-    # --- PASO ELIMINADO ---
-    # Ya no necesitamos obtener la IP, usaremos el nombre del contenedor directamente.
-    # - name: Guardar la dirección IP del contenedor
-    #   id: get_ip
-    #   run: |
-    #     IP_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mi-app)
-    #     echo "ZAP_TARGET_IP=$IP_ADDRESS" >> $GITHUB_ENV
-
-    # --- PASO MODIFICADO ---
-    # Usamos "mi-app" como el hostname, que Docker resolverá a la IP correcta.
     - name: Ejecutar escaneo de seguridad con ZAP
       run: |
         docker run --rm --name zap-scanner --network zap-scan-network \
