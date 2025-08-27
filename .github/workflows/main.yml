@@ -29,8 +29,9 @@ jobs:
         echo "Ejecutando todas las pruebas en la carpeta 'tests'..."
         pytest
 
-  # Tarea de escaneo de seguridad (versión 4, corregida)
+  # Tarea de escaneo de seguridad (versión 5, la definitiva)
   zap_scan:
+    # Esta tarea solo se ejecuta si la tarea de 'build' es exitosa.
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -41,16 +42,12 @@ jobs:
         # Reemplaza 'app.py' con el nombre de tu archivo principal si es diferente.
         run: |
           python app.py &
+          echo "Esperando 10 segundos para que la aplicación se inicie..."
           sleep 10
         
       - name: Escanear la aplicación con OWASP ZAP
         # Esta es la línea corregida. Apunta a la acción oficial y moderna.
-        uses: zaproxy/zap-action@v2.0.0
+        uses: zaproxy/action-baseline@v0.6.1
         with:
           # Aquí debes poner la URL de tu aplicación que se ejecuta localmente.
           target: 'http://localhost:5000'
-          # Tipo de escaneo. El 'baseline_scan' es un escaneo rápido.
-          cmd: 'baseline'
-          # Puedes incluir las siguientes opciones para personalizar el escaneo:
-          # report_html: true
-          # rules_file: '.zap/rules.txt' # Opcional: un archivo para ignorar reglas.
