@@ -56,7 +56,7 @@ jobs:
           ghcr.io/zaproxy/zaproxy:stable \
           zap-full-scan.py -t http://mi-app:5000 -r /zap/wrk/report.html
     - name: Subir reporte de ZAP
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: reporte-zap
         path: reports/     
