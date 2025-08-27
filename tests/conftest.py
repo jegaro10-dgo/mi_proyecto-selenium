@@ -1,33 +1,48 @@
 import pytest
-import datetime
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
+def pytest_addoption(parser):
+    """
+    Agrega la opción de línea de comandos --browser a pytest.
+    """
+    parser.addoption(
+        "--browser",
+        action="store",
+        default="chrome",
+        help="Navegador para ejecutar las pruebas (chrome o firefox)",
+    )
 
-@pytest.fixture(scope="function")
-def driver():
+@pytest.fixture(scope="session")
+def browser(request):
     """
-    Este fixture configura el driver de Selenium.
-    Se ejecuta una vez por cada prueba ('function').
+    Fixture para pasar el nombre del navegador a la prueba.
     """
-    # Configuración de las opciones del navegador
-    chrome_options = Options()
-    # Ejecutar en modo sin cabeza (headless), lo cual es necesario en entornos de CI como GitHub Actions.
-    chrome_options.add_argument("--headless")
-    # Argumentos adicionales para una ejecución más robusta en entornos de servidor.
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    
-    # Iniciar el driver
-    # Selenium ahora gestionará la instalación del driver automáticamente.
-    driver = webdriver.Chrome(options=chrome_options)
-    
-    # 'yield' devuelve el control a la prueba que lo llamó.
+    return request.config.getoption("--browser")
+
+@pytest.fixture(scope="session")
+def driver(browser):
+    """
+    Fixture que inicializa el WebDriver de Selenium basado en el navegador seleccionado.
+    """
+    if browser == "chrome":
+        chrome_options = ChromeOptions()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        driver = webdriver.Chrome(options=chrome_options)
+    elif browser == "firefox":
+        firefox_options = FirefoxOptions()
+        firefox_options.add_argument("--headless")
+        driver = webdriver.Firefox(options=firefox_options)
+    else:
+        raise ValueError(f"Navegador no soportado: {browser}")
+
     yield driver
-    
-    # Después de que la prueba se ejecuta, este código limpia y cierra el navegador.
     driver.quit()
+
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
