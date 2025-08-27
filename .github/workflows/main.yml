@@ -16,8 +16,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          # This is required to get a clean checkout of the repository,
-          # and not just a single commit.
+          # Esto es necesario para obtener un checkout limpio del repositorio.
           fetch-depth: 0
 
       - name: ZAP Baseline Scan
@@ -25,19 +24,13 @@ jobs:
         uses: zaproxy/action-baseline@v0.13.0
         with:
           target: 'http://testphp.vulnweb.com/'
-          # ZAP está diseñado para crear los reportes en el directorio de trabajo
-          # por defecto, así que le decimos que lo haga.
-          cmd_options: '-r zap-report.html'
+          # Se omite el parámetro -r para usar el comportamiento por defecto de ZAP
+          # que crea report_html.html en el directorio raíz.
           
-      # Este paso nos mostrará todos los archivos en el directorio de trabajo.
-      # Lo necesitamos para encontrar el reporte.
-      - name: List Files for Debugging
-        run: ls -R
-
-      # Usaremos una ruta genérica para ver si el reporte está ahí.
+      # Se carga el reporte HTML por defecto
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
           name: ZAP-Report
-          path: zap-report.html
+          path: report_html.html
           retention-days: 5
