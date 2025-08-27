@@ -32,3 +32,4 @@ pytest
 selenium
 faker
 pytest-html
+Flask==2.0.2
