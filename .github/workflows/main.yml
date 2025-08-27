@@ -51,6 +51,7 @@ jobs:
         
     - name: Escanear con OWASP ZAP
       run: |
+        mkdir -p reports
         docker run --rm --name zap-scanner --network zap-scan-network \
           -v $(pwd)/reports:/zap/wrk \
           ghcr.io/zaproxy/zaproxy:stable \
