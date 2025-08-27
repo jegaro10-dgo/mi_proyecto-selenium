@@ -24,10 +24,10 @@ jobs:
         uses: zaproxy/action-baseline@v0.13.0
         with:
           target: 'http://testphp.vulnweb.com/'
-          # Se omite el parámetro -r para usar el comportamiento por defecto de ZAP
-          # que crea report_html.html en el directorio raíz.
+          # Deshabilita la creación automática de incidencias para evitar errores de permisos.
+          issue_unverified: false
           
-      # Se carga el reporte HTML por defecto
+      # Se carga el reporte HTML por defecto.
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
