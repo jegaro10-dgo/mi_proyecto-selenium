@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 from datetime import datetime
+import os
 
 # --- Parte 1: Carga de datos de prueba ---
 def get_users(filename="user_data.txt"):
