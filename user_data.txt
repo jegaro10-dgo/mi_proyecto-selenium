@@ -33,3 +33,8 @@ Password: ContrasenaSegura123!
 First Name: Lisa
 Last Name: Bell
 ----------------------
+Email: hmiller@example.net
+Password: ContrasenaSegura123!
+First Name: Daniel
+Last Name: Bartlett
+----------------------

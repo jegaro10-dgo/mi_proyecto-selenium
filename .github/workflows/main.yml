@@ -1,0 +1,30 @@
+# Archivo: .github/workflows/main.yml
+name: Pruebas de Python
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v4
+      
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.9"
+        
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest requests
+        
+    - name: Ejecutar pruebas de Pytest
+      run: |
+        echo "Ejecutando todas las pruebas en la carpeta 'tests'..."
+        pytest
