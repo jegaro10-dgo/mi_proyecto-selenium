@@ -12,9 +12,11 @@ jobs:
   zap_scan:
     runs-on: ubuntu-latest
     name: Scan the web application
-    # Usamos solo el permiso de lectura de contenido, ya que no crearemos incidencias.
+    # El permiso 'issues: write' es necesario para que el bot pueda realizar la
+    # revisión de incidencias sin un error de permiso, aunque no vaya a crear una.
     permissions:
       contents: read
+      issues: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -26,16 +28,19 @@ jobs:
         uses: zaproxy/action-baseline@v0.13.0
         with:
           target: 'http://testphp.vulnweb.com/'
-          # Evita que la acción de ZAP falle si encuentra vulnerabilidades.
+          # Este parámetro evita que la acción falle si encuentra advertencias de seguridad.
           fail_action: false
-          # Deshabilita completamente la creación de incidencias.
+          # Deshabilita la creación de nuevas incidencias para evitar el error de permisos.
           issue_title: ''
-          
+
+      # Este paso es fundamental para subir el reporte de forma correcta,
+      # evitando el error de nombre de artefacto inválido de la acción de ZAP.
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-          # Usa un nombre de artefacto válido. El guión bajo a veces causa problemas.
+          # Nombre del artefacto de salida, tiene que ser un nombre válido.
           name: zap-security-report
-          # El nombre del archivo por defecto que genera la acción de ZAP.
+          # La ruta al reporte HTML generado por la acción de ZAP.
           path: report_html.html
+          # Días que se guardará el artefacto.
           retention-days: 5
