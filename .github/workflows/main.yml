@@ -14,8 +14,7 @@ jobs:
     name: Scan the web application
     permissions:
       contents: read
-      # Deniega explícitamente el permiso de crear incidencias para evitar errores.
-      issues: none
+      issues: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -29,6 +28,9 @@ jobs:
           target: 'http://testphp.vulnweb.com/'
           # Deshabilita la creación de incidencias, ya que no tienes permiso.
           issue_unverified: false
+        env:
+          # Desactiva la creación de incidencias.
+          ZAP_REPORT_CREATE_ISSUE: 'false'
           
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
