@@ -12,10 +12,9 @@ jobs:
   zap_scan:
     runs-on: ubuntu-latest
     name: Scan the web application
+    # Usamos solo el permiso de lectura de contenido, ya que no crearemos incidencias.
     permissions:
       contents: read
-      # El permiso issues es necesario para que el bot pueda buscar si hay incidencias abiertas.
-      issues: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -27,7 +26,16 @@ jobs:
         uses: zaproxy/action-baseline@v0.13.0
         with:
           target: 'http://testphp.vulnweb.com/'
-          # Este parámetro evita que la acción de ZAP falle si encuentra fallos de seguridad.
+          # Evita que la acción de ZAP falle si encuentra vulnerabilidades.
           fail_action: false
-          # Este parámetro controla el nombre del reporte HTML y del artefacto que se subirá.
-          html_report: 'zap-report.html'
+          # Deshabilita completamente la creación de incidencias.
+          issue_title: ''
+          
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        with:
+          # Usa un nombre de artefacto válido. El guión bajo a veces causa problemas.
+          name: zap-security-report
+          # El nombre del archivo por defecto que genera la acción de ZAP.
+          path: report_html.html
+          retention-days: 5
