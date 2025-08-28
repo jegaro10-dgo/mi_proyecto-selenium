@@ -12,11 +12,11 @@ jobs:
   zap_scan:
     runs-on: ubuntu-latest
     name: Scan the web application
-    # El permiso 'issues: write' es necesario para que el bot pueda realizar la
-    # revisión de incidencias sin un error de permiso, aunque no vaya a crear una.
     permissions:
       contents: read
       issues: write
+      pull-requests: write
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -30,8 +30,8 @@ jobs:
           target: 'http://testphp.vulnweb.com/'
           # Este parámetro evita que la acción falle si encuentra advertencias de seguridad.
           fail_action: false
-          # Deshabilita la creación de nuevas incidencias para evitar el error de permisos.
-          issue_title: ''
+          # Esta es la línea clave: deshabilita por completo la creación de incidencias.
+          allow_issue_creation: false
 
       # Este paso es fundamental para subir el reporte de forma correcta,
       # evitando el error de nombre de artefacto inválido de la acción de ZAP.
