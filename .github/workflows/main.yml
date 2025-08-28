@@ -12,8 +12,6 @@ jobs:
   zap_scan:
     runs-on: ubuntu-latest
     name: Scan the web application
-    # Usamos permisos mínimos para evitar cualquier problema
-    # de acceso no autorizado y seguir las mejores prácticas de seguridad.
     permissions:
       contents: read
     steps:
@@ -28,13 +26,11 @@ jobs:
         with:
           target: 'http://testphp.vulnweb.com/'
           fail_action: false
-          # Esta es la linea clave que deshabilita la conexión a GitHub Issues.
-          # Al pasar un token vacío, la acción no intentará crear ni actualizar incidencias.
-          env:
-            GH_TOKEN: ''
+        # ¡CORRECCIÓN! Esta línea estaba mal indentada. Ahora está al mismo
+        # nivel que 'with:'. Esto resuelve el error de sintaxis.
+        env:
+          GH_TOKEN: ''
 
-      # Este paso es fundamental para subir el reporte de forma correcta,
-      # ya que la acción de ZAP tiene un comportamiento interno inconsistente.
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
