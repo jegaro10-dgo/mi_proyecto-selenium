@@ -12,11 +12,10 @@ jobs:
   zap_scan:
     runs-on: ubuntu-latest
     name: Scan the web application
+    # Usamos permisos mínimos para evitar cualquier problema
+    # de acceso no autorizado y seguir las mejores prácticas de seguridad.
     permissions:
       contents: read
-      issues: write
-      pull-requests: write
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -28,19 +27,17 @@ jobs:
         uses: zaproxy/action-baseline@v0.13.0
         with:
           target: 'http://testphp.vulnweb.com/'
-          # Este parámetro evita que la acción falle si encuentra advertencias de seguridad.
           fail_action: false
-          # Esta es la línea clave: deshabilita por completo la creación de incidencias.
-          allow_issue_creation: false
+          # Esta es la linea clave que deshabilita la conexión a GitHub Issues.
+          # Al pasar un token vacío, la acción no intentará crear ni actualizar incidencias.
+          env:
+            GH_TOKEN: ''
 
       # Este paso es fundamental para subir el reporte de forma correcta,
-      # evitando el error de nombre de artefacto inválido de la acción de ZAP.
+      # ya que la acción de ZAP tiene un comportamiento interno inconsistente.
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-          # Nombre del artefacto de salida, tiene que ser un nombre válido.
           name: zap-security-report
-          # La ruta al reporte HTML generado por la acción de ZAP.
           path: report_html.html
-          # Días que se guardará el artefacto.
           retention-days: 5
