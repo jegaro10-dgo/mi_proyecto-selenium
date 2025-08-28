@@ -14,45 +14,6 @@ jobs:
     name: Scan the web application
     permissions:
       contents: read
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: ZAP Baseline Scan
-        id: zap
-        uses: zaproxy/action-baseline@v0.13.0
-        with:
-          target: 'http://testphp.vulnweb.com/'
-          fail_action: false
-        # ¡CORRECCIÓN! Esta línea estaba mal indentada. Ahora está al mismo
-        # nivel que 'with:'. Esto resuelve el error de sintaxis.
-        env:
-          GH_TOKEN: ''
-
-      - name: Upload ZAP Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-security-report
-          path: report_html.html
-          retention-days: 5
-      - name: ZAP Baseline Scan
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  zap_scan:
-    runs-on: ubuntu-latest
-    name: Scan the web application
-    permissions:
-      contents: read
       # Desactivamos explícitamente el permiso de 'issues' para que la acción de ZAP no pueda
       # crear ni actualizar incidencias, resolviendo el error de "Resource not accessible".
       issues: write
