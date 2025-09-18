@@ -13,9 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Scan the web application
     permissions:
-      contents: read
-      # Desactivamos explícitamente el permiso de 'issues' para que la acción de ZAP no pueda
-      # crear ni actualizar incidencias, resolviendo el error de "Resource not accessible".
+      contents: write
       issues: write
     steps:
       - name: Checkout Repository
@@ -32,16 +30,21 @@ jobs:
         env:
           GH_TOKEN: ''
 
-      - name: Upload ZAP Report
+  upload_report:
+    runs-on: ubuntu-latest
+    name: Upload ZAP Scan Report
+    needs: zap_scan
+    if: always()
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Upload Report as Artifact
         uses: actions/upload-artifact@v4
         with:
-          # Se ha cambiado el nombre del artefacto a "zap-scan-results" para evitar errores de validación segunda prueba.
           name: zap-scan-results
-          path: report_html.html
+          path: |
+            report_html.html
           retention-days: 5
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests  # Agrega esta línea para instalar la librería
-          pip install -r requirements.txt
