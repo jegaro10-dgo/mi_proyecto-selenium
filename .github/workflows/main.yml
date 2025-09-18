@@ -35,8 +35,8 @@ jobs:
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-          # Se ha cambiado el nombre del artefacto a "zap-report" para evitar errores de validación.
-          name: zap-report
+          # Se ha cambiado el nombre del artefacto a "zap-scan-results" para evitar errores de validación.
+          name: zap-scan-results
           path: report_html.html
           retention-days: 5
 
