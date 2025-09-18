@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Scan the web application
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
