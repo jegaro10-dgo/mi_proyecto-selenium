@@ -39,3 +39,9 @@ jobs:
           name: zap-report
           path: report_html.html
           retention-days: 5
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests  # Agrega esta línea para instalar la librería
+          pip install -r requirements.txt
