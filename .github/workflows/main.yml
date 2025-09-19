@@ -1,4 +1,4 @@
-name: ZAP Baseline Scan
+name: ZAP Full Scan
 
 on:
   push:
@@ -9,32 +9,25 @@ on:
       - main
 
 jobs:
-  zap_scan:
+  zap_full_scan:
     runs-on: ubuntu-latest
-    name: Scan the web application
-    permissions:
-      contents: write
-      issues: write
+    name: Full Scan the web application
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: ZAP Baseline Scan
+      - name: ZAP Full Scan
         id: zap
-        uses: zaproxy/action-baseline@v0.13.0
+        uses: zaproxy/action-full-scan@v0.13.0
         with:
           target: 'http://testphp.vulnweb.com/'
-          fail_action: false
-          issue_title: 'ZAP Baseline Scan Report'
-          issue_body: 'ZAP Scan Report'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Upload ZAP Report
+      - name: Upload Report
         uses: actions/upload-artifact@v4
         with:
           name: zap-scan-report
-          path: report_html.html
+          path: |
+            report.html
           retention-days: 5
