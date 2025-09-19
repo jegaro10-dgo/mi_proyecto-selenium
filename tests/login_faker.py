@@ -39,6 +39,7 @@ if not users:
     exit()
 
 # Seleccionar el usuario de la lista para la prueba
+
 test_user = users[1]
 EMAIL = test_user['email']
 PASSWORD = test_user['password']

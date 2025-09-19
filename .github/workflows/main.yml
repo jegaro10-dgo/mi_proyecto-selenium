@@ -33,3 +33,24 @@ jobs:
           name: zap-scan-report
           path: report.html
           retention-days: 5
+  run_pytest_tests:
+    runs-on: ubuntu-latest
+    name: Run Pytest Tests
+    needs: zap_full_scan # Esto asegura que este job se ejecute después del escaneo de ZAP
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium chromedriver-autoinstaller pytest
+          
+      - name: Run Pytest Tests
+        run: |
+          pytest tests/
