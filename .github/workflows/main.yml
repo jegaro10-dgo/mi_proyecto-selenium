@@ -10,8 +10,14 @@ on:
 
 jobs:
   run_pytest_tests:
+    # Agrega la estrategia de matriz aquí
+    strategy:
+      matrix:
+        browser: [chrome, firefox] # Define los navegadores para los que se ejecutará el job
+        
     runs-on: ubuntu-latest
-    name: Run Pytest Tests
+    # Nombre del job dinámico para mostrar el navegador
+    name: "Run Pytest Tests (${{ matrix.browser }})"
     needs: []
     
     steps:
@@ -21,14 +27,19 @@ jobs:
       - name: Set up Python and Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install selenium chromedriver-autoinstaller pytest pytest-html requests
+          # Cambiamos chromedriver-autoinstaller por webdriver-manager para manejar varios navegadores
+          pip install selenium webdriver-manager pytest pytest-html requests
           
       - name: Run Pytest Tests
+        # Pasamos el nombre del navegador como una variable de entorno
+        env:
+          BROWSER: ${{ matrix.browser }}
         run: |
           pytest --html=report.html --self-contained-html
           
       - name: Upload HTML Report
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-reports
+          # Nombre del reporte dinámico para no sobrescribir
+          name: "pytest-report-${{ matrix.browser }}"
           path: '*.html'
