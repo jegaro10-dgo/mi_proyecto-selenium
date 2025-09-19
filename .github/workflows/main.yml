@@ -20,7 +20,7 @@ jobs:
 
       - name: ZAP Full Scan
         id: zap
-        uses: zaproxy/action-full-scan@v0.13.0
+        uses: zaproxy/action-full-scan@v0.2.0 # Corrected version
         with:
           target: 'http://testphp.vulnweb.com/'
           
@@ -28,6 +28,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: zap-scan-report
-          path: |
-            report.html
+          path: report.html
           retention-days: 5
