@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import chromedriver_autoinstaller
+import pytest
 
 # --- Paso 1: Leer los datos del usuario desde el archivo ---
 def load_users_from_file(filename="user_data.txt"):
