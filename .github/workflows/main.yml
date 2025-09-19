@@ -23,7 +23,7 @@ jobs:
 
       - name: ZAP Full Scan
         id: zap
-        uses: zaproxy/action-full-scan@v0.13.0 # Versión corregida
+        uses: zaproxy/action-full-scan@v0.12.0 # Versión corregida
         with:
           target: 'http://testphp.vulnweb.com/'
           
