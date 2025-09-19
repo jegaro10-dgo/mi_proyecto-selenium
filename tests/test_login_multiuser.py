@@ -8,8 +8,13 @@ import time
 # --- Fixture para inicializar y cerrar el navegador ---
 @pytest.fixture(scope="module")
 def driver():
-    print("\nInicializando WebDriver...")
-    driver_instance = webdriver.Chrome()
+    print("\nInicializando WebDriver en modo headless...")
+    # Configurar las opciones de Chrome para el modo headless
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    driver_instance = webdriver.Chrome(options=options)
     yield driver_instance
     print("\nCerrando WebDriver...")
     driver_instance.quit()

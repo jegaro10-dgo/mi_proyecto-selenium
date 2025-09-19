@@ -50,10 +50,13 @@ jobs:
           
       - name: Run Pytest Tests and Generate Report
         run: |
-          pytest --html=report.html --self-contained-html
+          # Ejecutar pruebas de API en paralelo
+          pytest tests/test_api_refactored.py --html=report_api.html --self-contained-html
+          # Ejecutar pruebas de Selenium de forma secuencial para evitar conflictos
+          pytest tests/test_login_multiuser.py --html=report_selenium.html --self-contained-html
           
       - name: Upload HTML Report
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-report
-          path: report.html
+          name: pytest-reports
+          path: '*.html'
