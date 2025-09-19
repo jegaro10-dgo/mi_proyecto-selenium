@@ -27,23 +27,14 @@ jobs:
         with:
           target: 'http://testphp.vulnweb.com/'
           fail_action: false
+          issue_title: 'ZAP Baseline Scan Report'
+          issue_body: 'ZAP Scan Report'
         env:
-          GH_TOKEN: ''
-
-  upload_report:
-    runs-on: ubuntu-latest
-    name: Upload ZAP Scan Report
-    needs: zap_scan
-    if: always()
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Upload Report as Artifact
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-          name: zap-scan-results
+          name: zap-scan-report
           path: report_html.html
           retention-days: 5
