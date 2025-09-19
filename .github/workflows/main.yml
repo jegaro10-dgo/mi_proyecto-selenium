@@ -1,4 +1,4 @@
-name: ZAP Full Scan
+name: CI con Pytest
 
 on:
   push:
@@ -9,35 +9,10 @@ on:
       - main
 
 jobs:
-  #zap_full_scan:
-   # runs-on: ubuntu-latest
-   # name: Full Scan the web application
-   # permissions:
-   #   contents: write
-   #   issues: write
-   # steps:
-   #   - name: Checkout Repository
-   #     uses: actions/checkout@v4
-    #    with:
-     #     fetch-depth: 0
-
-      #- name: ZAP Full Scan
-       # id: zap
-        #uses: zaproxy/action-full-scan@v0.12.0 # Versión corregida
-        #with:
-         # target: 'http://testphp.vulnweb.com/'
-          
-      #- name: Upload Report
-       # uses: actions/upload-artifact@v4
-        #with:
-         # name: zap-scan-report
-          #path: report.html
-          #retention-days: 5
-   
-   run_pytest_tests:
+  run_pytest_tests:
     runs-on: ubuntu-latest
     name: Run Pytest Tests
-    needs: [] # No tiene dependencias, ya que ZAP está comentado
+    needs: []
     
     steps:
       - name: Checkout Repository
@@ -48,12 +23,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install selenium chromedriver-autoinstaller pytest pytest-html requests
           
-      - name: Run Pytest Tests and Generate Report
+      - name: Run Pytest Tests
         run: |
-          # Ejecutar pruebas de API en paralelo
-          pytest tests/test_api_refactored.py --html=report_api.html --self-contained-html
-          # Ejecutar pruebas de Selenium de forma secuencial para evitar conflictos
-          pytest tests/test_login_multiuser.py --html=report_selenium.html --self-contained-html
+          pytest --html=report.html --self-contained-html
           
       - name: Upload HTML Report
         uses: actions/upload-artifact@v4
